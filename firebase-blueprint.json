@@ -1,0 +1,162 @@
+{
+  "entities": {
+    "activity": {
+      "title": "Activity Log",
+      "description": "A summit hike or running training log entry",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the activity log",
+          "maxLength": 128
+        },
+        "activityType": {
+          "type": "string",
+          "description": "Type of outdoor activity",
+          "enum": ["summit", "running"]
+        },
+        "date": {
+          "type": "string",
+          "description": "Date of activity in ISO format YYYY-MM-DD",
+          "maxLength": 30
+        },
+        "durationMinutes": {
+          "type": "number",
+          "description": "Duration of activity in minutes"
+        },
+        "distanceKm": {
+          "type": "number",
+          "description": "Distance covered in kilometers"
+        },
+        "elevationGainM": {
+          "type": "number",
+          "description": "Elevation gained in meters"
+        },
+        "mountainId": {
+          "type": "string",
+          "description": "Mountain ID for summit hikes",
+          "maxLength": 100
+        },
+        "mountainName": {
+          "type": "string",
+          "description": "Mountain name in English",
+          "maxLength": 150
+        },
+        "koreanName": {
+          "type": "string",
+          "description": "Mountain name in Korean Hangul",
+          "maxLength": 150
+        },
+        "peakName": {
+          "type": "string",
+          "description": "Specific peak reached",
+          "maxLength": 150
+        },
+        "elevationM": {
+          "type": "number",
+          "description": "Peak elevation in meters"
+        },
+        "summitNumber": {
+          "type": "number",
+          "description": "Ascent counter for this peak"
+        },
+        "weather": {
+          "type": "string",
+          "description": "Weather conditions during activity",
+          "maxLength": 100
+        },
+        "companions": {
+          "type": "string",
+          "description": "Companions who joined the hike",
+          "maxLength": 100
+        },
+        "trailTaken": {
+          "type": "string",
+          "description": "Trail or course taken",
+          "maxLength": 200
+        },
+        "location": {
+          "type": "string",
+          "description": "General location or province description",
+          "maxLength": 200
+        },
+        "title": {
+          "type": "string",
+          "description": "Run title or summary name",
+          "maxLength": 200
+        },
+        "paceMinPerKm": {
+          "type": "string",
+          "description": "Average running pace",
+          "maxLength": 20
+        },
+        "locationName": {
+          "type": "string",
+          "description": "Running location description",
+          "maxLength": 200
+        },
+        "routeType": {
+          "type": "string",
+          "description": "Terrain type for running",
+          "maxLength": 100
+        },
+        "notes": {
+          "type": "string",
+          "description": "Hiker/Runner journal reflections and gear notes",
+          "maxLength": 2000
+        },
+        "authorUid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the creator",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last modification"
+        }
+      },
+      "required": ["id", "activityType", "date", "durationMinutes", "distanceKm", "elevationGainM"]
+    },
+    "admin": {
+      "title": "Admin Role Document",
+      "description": "Represents an authorized administrator for write access",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Auth UID of the admin",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "description": "Email of admin",
+          "maxLength": 150
+        },
+        "role": {
+          "type": "string",
+          "description": "User role",
+          "enum": ["admin", "owner"]
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp created"
+        }
+      },
+      "required": ["uid", "role"]
+    }
+  },
+  "firestore": {
+    "/activities/{activityId}": {
+      "schema": "activity",
+      "description": "Publicly readable collection of summit and running activities; writable only by authenticated users or admins"
+    },
+    "/admins/{adminId}": {
+      "schema": "admin",
+      "description": "Collection tracking authorized system administrators"
+    }
+  }
+}

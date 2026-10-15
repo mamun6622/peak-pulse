@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, MapPin, Camera, Clock, Route, Compass, Plus, Mountain, ChevronRight, Layers } from 'lucide-react';
+import { X, Calendar, MapPin, Camera, Clock, Route, Compass, Plus, Mountain, ChevronRight, Layers, Edit, Trash2 } from 'lucide-react';
 import { MountainSummary, SummitLog, PhotoItem } from '../types/activity';
 
 interface MountainDetailModalProps {
@@ -8,6 +8,8 @@ interface MountainDetailModalProps {
   onClose: () => void;
   onSelectPhoto: (photo: PhotoItem, title: string, subtitle: string) => void;
   onLogNextSummit: (mountain: MountainSummary) => void;
+  onEditSummit?: (summit: SummitLog) => void;
+  onDeleteSummit?: (id: string) => void;
 }
 
 export const MountainDetailModal: React.FC<MountainDetailModalProps> = ({
@@ -16,6 +18,8 @@ export const MountainDetailModal: React.FC<MountainDetailModalProps> = ({
   onClose,
   onSelectPhoto,
   onLogNextSummit,
+  onEditSummit,
+  onDeleteSummit,
 }) => {
   const [activeTab, setActiveTab] = useState<'summits' | 'photos' | 'routes'>('summits');
 
@@ -158,6 +162,29 @@ export const MountainDetailModal: React.FC<MountainDetailModalProps> = ({
                       <span>{summit.weather}</span>
                       <span aria-hidden="true" className="text-stone-700">·</span>
                       <span>{summit.companions}</span>
+
+                      {isAdmin && (
+                        <div className="flex items-center gap-1 ml-2 pl-2 border-l border-stone-800">
+                          {onEditSummit && (
+                            <button
+                              onClick={() => onEditSummit(summit)}
+                              className="p-1 text-stone-400 hover:text-amber-300 hover:bg-stone-800 rounded transition-colors cursor-pointer"
+                              title="Edit this summit log"
+                            >
+                              <Edit className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                          {onDeleteSummit && (
+                            <button
+                              onClick={() => onDeleteSummit(summit.id)}
+                              className="p-1 text-stone-400 hover:text-rose-400 hover:bg-rose-950/30 rounded transition-colors cursor-pointer"
+                              title="Delete this summit log"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
 

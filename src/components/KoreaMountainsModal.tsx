@@ -25,7 +25,7 @@ export const KoreaMountainsModal: React.FC<KoreaMountainsModalProps> = ({
 
   if (!isOpen) return null;
 
-  const provinces = ['all', 'Seoul', 'Gyeonggi', 'Gangwon', 'Chungcheong', 'Jeolla', 'Gyeongsang', 'Jeju'];
+  const provinces = ['all', 'Busan', 'Seoul', 'Gyeonggi', 'Gangwon', 'Chungcheong', 'Jeolla', 'Gyeongsang', 'Jeju'];
 
   const filteredMountains = KOREA_ALL_MOUNTAINS.filter((m) => {
     if (selectedProvince !== 'all' && m.province !== selectedProvince) return false;

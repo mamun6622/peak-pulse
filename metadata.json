@@ -2,5 +2,7 @@
   "name": "PeakPulse Korea · Mountain Summit & Running Log",
   "description": "Personal outdoor tracker showcasing Korea mountain summits, ascent counts, photos, trail runs, and monthly statistics.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

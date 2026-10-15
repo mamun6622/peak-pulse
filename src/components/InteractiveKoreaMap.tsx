@@ -118,12 +118,24 @@ export const InteractiveKoreaMap: React.FC<InteractiveKoreaMapProps> = ({
                   opacity="0.6"
                 />
 
+                {/* Nakdong River stylized bend leading into Busan */}
+                <path
+                  d="M440,320 Q480,400 500,470"
+                  fill="none"
+                  stroke="#0284c7"
+                  strokeWidth="2"
+                  opacity="0.5"
+                />
+
                 {/* Regional Labels */}
                 <text x="210" y="165" fill="#78716c" fontSize="12" fontFamily="sans-serif" fontWeight="600">
                   Seoul Capital Area
                 </text>
                 <text x="460" y="180" fill="#78716c" fontSize="12" fontFamily="sans-serif">
                   Gangwon-do Ridges
+                </text>
+                <text x="470" y="475" fill="#f59e0b" fontSize="12" fontFamily="sans-serif" fontWeight="600">
+                  Busan Coastal Peaks (부산)
                 </text>
                 <text x="160" y="730" fill="#78716c" fontSize="12" fontFamily="sans-serif">
                   Jeju Island

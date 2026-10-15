@@ -1,13 +1,20 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Activity, MountainSummary, PhotoItem } from './types/activity';
-import { loadActivities, initStorage, addActivity, deleteActivity } from './services/storageService';
+import { Activity, MountainSummary, PhotoItem, SummitLog } from './types/activity';
+import { loadActivities, initStorage, addActivity, updateActivity, deleteActivity, saveActivities } from './services/storageService';
+import {
+  subscribeToFirestoreActivities,
+  saveActivityToFirestore,
+  deleteActivityFromFirestore,
+  syncAllActivitiesToFirestore,
+} from './services/firebaseFirestoreService';
+import { subscribeToAuthChanges, logoutFirebase, auth } from './services/firebase';
 import {
   calculateMountainSummaries,
   calculateMonthlyStats,
   calculatePersonalRecords,
 } from './utils/activityStats';
 import { calculateProgression } from './utils/progressionSystem';
-import { KOREA_ALL_MOUNTAINS } from './data/koreaMountainsDatabase';
+import { KOREA_ALL_MOUNTAINS, KoreaMountain } from './data/koreaMountainsDatabase';
 
 import { Navbar } from './components/Navbar';
 import { HeroOverview } from './components/HeroOverview';
@@ -23,21 +30,24 @@ import { PhotoLightbox } from './components/PhotoLightbox';
 import { DataManagementModal } from './components/DataManagementModal';
 import { AdminAuthModal } from './components/AdminAuthModal';
 import { KoreaMountainsModal } from './components/KoreaMountainsModal';
-import { Mountain, ShieldCheck } from 'lucide-react';
+import { KoreaMountainProgress } from './components/KoreaMountainProgress';
+import { Mountain, ShieldCheck, CheckCircle2, AlertCircle, Flame } from 'lucide-react';
 
 export default function App() {
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [activeTab, setActiveTab] = useState<'summits' | 'running' | 'stats' | 'map' | 'photos'>('summits');
+  const [activeTab, setActiveTab] = useState<'summits' | 'progress' | 'running' | 'stats' | 'map' | 'photos'>('summits');
 
   // Role / Auth State: viewer by default, owner can unlock admin mode
   const [isAdmin, setIsAdmin] = useState<boolean>(() => {
     return sessionStorage.getItem('peakpulse_is_admin') === 'true';
   });
+  const [firebaseUserEmail, setFirebaseUserEmail] = useState<string | null>(auth.currentUser?.email || null);
 
   // Modals state
   const [selectedMountainId, setSelectedMountainId] = useState<string | null>(null);
   const [isLogModalOpen, setIsLogModalOpen] = useState<boolean>(false);
   const [preselectedMountainForLog, setPreselectedMountainForLog] = useState<MountainSummary | null>(null);
+  const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const [isDataModalOpen, setIsDataModalOpen] = useState<boolean>(false);
   const [isAdminAuthOpen, setIsAdminAuthOpen] = useState<boolean>(false);
   const [isKoreaDirectoryOpen, setIsKoreaDirectoryOpen] = useState<boolean>(false);
@@ -46,6 +56,16 @@ export default function App() {
     title: string;
     subtitle: string;
   } | null>(null);
+
+  // Toast feedback
+  const [toastMsg, setToastMsg] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
+
+  const showToast = (text: string, type: 'success' | 'info' | 'error' = 'success') => {
+    setToastMsg({ text, type });
+    setTimeout(() => {
+      setToastMsg((current) => (current?.text === text ? null : current));
+    }, 4000);
+  };
 
   // Load activities on mount with sync read & async IndexedDB reconciliation
   useEffect(() => {
@@ -56,6 +76,41 @@ export default function App() {
     initStorage().then((loaded) => {
       setActivities(loaded);
     });
+  }, []);
+
+  // Listen to Firebase Auth state
+  useEffect(() => {
+    const unsubAuth = subscribeToAuthChanges((user) => {
+      setFirebaseUserEmail(user?.email || null);
+      if (user) {
+        setIsAdmin(true);
+        sessionStorage.setItem('peakpulse_is_admin', 'true');
+        // Once signed in with Google, push any local activities to Firestore
+        const local = loadActivities();
+        if (local && local.length > 0) {
+          syncAllActivitiesToFirestore(local).catch(() => {});
+        }
+      }
+    });
+    return () => unsubAuth();
+  }, []);
+
+  // Real-time Firestore Cloud activities sync
+  useEffect(() => {
+    const unsubFirestore = subscribeToFirestoreActivities(
+      (firestoreItems) => {
+        if (firestoreItems && firestoreItems.length > 0) {
+          setActivities(firestoreItems);
+          saveActivities(firestoreItems);
+        }
+      },
+      (err) => {
+        console.warn('Real-time Firestore subscription note:', err);
+      }
+    );
+    return () => {
+      if (unsubFirestore) unsubFirestore();
+    };
   }, []);
 
   // Compute stats
@@ -75,27 +130,74 @@ export default function App() {
   const handleLoginSuccess = () => {
     setIsAdmin(true);
     sessionStorage.setItem('peakpulse_is_admin', 'true');
+    showToast('Admin mode activated! Full access to add, edit, and delete activities.');
   };
 
   const handleLogout = () => {
     setIsAdmin(false);
     sessionStorage.removeItem('peakpulse_is_admin');
+    logoutFirebase().catch(() => {});
+    showToast('Switched to public viewer mode.', 'info');
   };
 
-  // Activity Handlers
-  const handleSaveActivity = (newAct: Activity) => {
-    const updated = addActivity(newAct);
-    setActivities(updated);
+  // Activity Handlers: Save (Create or Edit)
+  const handleSaveActivity = async (savedAct: Activity) => {
+    if (editingActivity) {
+      // Edit mode
+      const updated = updateActivity(savedAct);
+      setActivities(updated);
+      setEditingActivity(null);
+
+      try {
+        await saveActivityToFirestore(savedAct);
+        showToast('Activity changes saved and synchronized to Cloud Firestore!');
+      } catch (err: any) {
+        console.warn('Firestore update note:', err);
+        showToast('Saved locally. Sign in with Google to sync with cloud database.', 'info');
+      }
+    } else {
+      // Create mode
+      const updated = addActivity(savedAct);
+      setActivities(updated);
+
+      try {
+        await saveActivityToFirestore(savedAct);
+        showToast('Activity and photos saved directly to Cloud Firestore!');
+      } catch (err: any) {
+        console.warn('Firestore create note:', err);
+        showToast('Saved locally. Sign in with Google to sync with cloud database.', 'info');
+      }
+    }
   };
 
-  const handleDeleteActivity = (id: string) => {
+  // Edit Activity Trigger
+  const handleStartEditActivity = (act: Activity) => {
     if (!isAdmin) {
       setIsAdminAuthOpen(true);
       return;
     }
-    if (window.confirm('Are you sure you want to delete this activity log?')) {
+    setEditingActivity(act);
+    setPreselectedMountainForLog(null);
+    setIsLogModalOpen(true);
+  };
+
+  // Delete Activity Trigger
+  const handleDeleteActivity = async (id: string) => {
+    if (!isAdmin) {
+      setIsAdminAuthOpen(true);
+      return;
+    }
+    if (window.confirm('Are you sure you want to delete this activity log from your journal and database?')) {
       const updated = deleteActivity(id);
       setActivities(updated);
+
+      try {
+        await deleteActivityFromFirestore(id);
+        showToast('Activity deleted from journal and Cloud Firestore database.');
+      } catch (err) {
+        console.warn('Deleted locally, Firestore note:', err);
+        showToast('Deleted locally.', 'info');
+      }
     }
   };
 
@@ -108,6 +210,7 @@ export default function App() {
       setIsAdminAuthOpen(true);
       return;
     }
+    setEditingActivity(null);
     setPreselectedMountainForLog(m);
     setIsLogModalOpen(true);
   };
@@ -117,6 +220,7 @@ export default function App() {
       setIsAdminAuthOpen(true);
       return;
     }
+    setEditingActivity(null);
     setPreselectedMountainForLog(null);
     setIsLogModalOpen(true);
   };
@@ -127,15 +231,31 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col font-sans selection:bg-amber-500/20 selection:text-amber-300">
+      {/* Toast Notification Banner */}
+      {toastMsg && (
+        <div className="fixed top-20 right-4 z-50 max-w-sm p-3.5 rounded-xl bg-stone-900 border border-stone-700 shadow-2xl flex items-center gap-2.5 text-xs text-stone-200 animate-in fade-in slide-in-from-top-4 duration-300">
+          {toastMsg.type === 'success' ? (
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          ) : toastMsg.type === 'info' ? (
+            <Flame className="w-4 h-4 text-orange-400 shrink-0" />
+          ) : (
+            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+          )}
+          <span>{toastMsg.text}</span>
+        </div>
+      )}
+
       {/* Navigation */}
       <Navbar
         activeTab={activeTab}
         onSelectTab={setActiveTab}
         isAdmin={isAdmin}
+        firebaseUserEmail={firebaseUserEmail}
         onOpenLogModal={handleOpenGeneralLogModal}
         onOpenDataModal={() => setIsDataModalOpen(true)}
         onOpenAdminLogin={() => setIsAdminAuthOpen(true)}
         onLogoutAdmin={handleLogout}
+        onOpenSecurityModal={() => setIsAdminAuthOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -162,7 +282,7 @@ export default function App() {
           uniqueSummitedCount={mountainSummaries.length}
         />
 
-        {/* View Switching based on active tab */}
+        {/* TAB 1: Mountain Summits */}
         {activeTab === 'summits' && (
           <>
             <HallOfPeaks
@@ -178,23 +298,48 @@ export default function App() {
               isAdmin={isAdmin}
               onSelectPhoto={handleSelectPhoto}
               onSelectMountain={handleSelectMountain}
+              onEditActivity={handleStartEditActivity}
               onDeleteActivity={handleDeleteActivity}
               initialFilter="summit"
             />
           </>
         )}
 
+        {/* TAB 2: Busan & Korea Mountain Progress Tracker */}
+        {activeTab === 'progress' && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <KoreaMountainProgress
+              activities={activities}
+              mountainSummaries={mountainSummaries}
+              onSelectMountain={handleSelectMountain}
+              onLogAscentForMountain={(mountain: KoreaMountain) => {
+                if (!isAdmin) {
+                  setIsAdminAuthOpen(true);
+                  return;
+                }
+                const summary = mountainSummaries.find((s) => s.mountainId === mountain.id);
+                setEditingActivity(null);
+                setPreselectedMountainForLog(summary || null);
+                setIsLogModalOpen(true);
+              }}
+            />
+          </div>
+        )}
+
+        {/* TAB 3: Running Logs */}
         {activeTab === 'running' && (
           <ActivityTimeline
             activities={activities}
             isAdmin={isAdmin}
             onSelectPhoto={handleSelectPhoto}
             onSelectMountain={handleSelectMountain}
+            onEditActivity={handleStartEditActivity}
             onDeleteActivity={handleDeleteActivity}
             initialFilter="running"
           />
         )}
 
+        {/* TAB 4: Analytics & PRs */}
         {activeTab === 'stats' && (
           <MonthlyStatsDashboard
             monthlyStats={monthlyStats}
@@ -203,6 +348,7 @@ export default function App() {
           />
         )}
 
+        {/* TAB 5: Korea Peak Map */}
         {activeTab === 'map' && (
           <InteractiveKoreaMap
             mountains={mountainSummaries}
@@ -210,6 +356,7 @@ export default function App() {
           />
         )}
 
+        {/* TAB 6: Photo Archive */}
         {activeTab === 'photos' && (
           <PhotoArchiveGallery
             activities={activities}
@@ -218,7 +365,9 @@ export default function App() {
         )}
       </main>
 
-      {/* Modals */}
+      {/* MODALS */}
+
+      {/* Mountain Detail Modal with Repeat Ascents & Edit/Delete */}
       {currentSelectedMountain && (
         <MountainDetailModal
           mountain={currentSelectedMountain}
@@ -229,21 +378,32 @@ export default function App() {
             setSelectedMountainId(null);
             handleQuickLogForMountain(m);
           }}
+          onEditSummit={(summit: SummitLog) => {
+            setSelectedMountainId(null);
+            handleStartEditActivity(summit);
+          }}
+          onDeleteSummit={(id: string) => {
+            handleDeleteActivity(id);
+          }}
         />
       )}
 
+      {/* Log / Edit Activity Modal */}
       {isLogModalOpen && (
         <LogActivityModal
           mountains={mountainSummaries}
           preselectedMountain={preselectedMountainForLog}
+          initialActivity={editingActivity}
           onClose={() => {
             setIsLogModalOpen(false);
             setPreselectedMountainForLog(null);
+            setEditingActivity(null);
           }}
           onSave={handleSaveActivity}
         />
       )}
 
+      {/* Photo Lightbox */}
       {lightboxData && (
         <PhotoLightbox
           photo={lightboxData.photo}
@@ -253,19 +413,24 @@ export default function App() {
         />
       )}
 
+      {/* Data Management & Cloud Sync Modal */}
       {isDataModalOpen && (
         <DataManagementModal
           activities={activities}
           onClose={() => setIsDataModalOpen(false)}
-          onDataChanged={setActivities}
+          onDataChanged={(updated) => {
+            setActivities(updated);
+            saveActivities(updated);
+          }}
         />
       )}
 
-      {/* Admin Authentication Modal */}
+      {/* Admin Authentication & Firebase Security Modal */}
       <AdminAuthModal
         isOpen={isAdminAuthOpen}
         onClose={() => setIsAdminAuthOpen(false)}
         onLoginSuccess={handleLoginSuccess}
+        isAdmin={isAdmin}
       />
 
       {/* Korea Mountains Catalog Directory Modal */}
@@ -302,7 +467,12 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-4 text-stone-500 font-mono">
-            <span>Seoul, South Korea 🇰🇷</span>
+            <span>Busan & South Korea 🇰🇷</span>
+            <span>·</span>
+            <span className="text-orange-400/90 inline-flex items-center gap-1">
+              <Flame className="w-3 h-3" />
+              <span>Cloud Firestore Active</span>
+            </span>
             <span>·</span>
             {isAdmin ? (
               <span className="text-amber-400 inline-flex items-center gap-1">

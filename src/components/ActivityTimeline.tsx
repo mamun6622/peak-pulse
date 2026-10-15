@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Mountain, Footprints, Calendar, Clock, MapPin, Search, Filter, Camera, Trash2, ArrowUpRight } from 'lucide-react';
+import { Mountain, Footprints, Calendar, Clock, MapPin, Search, Filter, Camera, Trash2, ArrowUpRight, Edit } from 'lucide-react';
 import { Activity, SummitLog, RunningLog, PhotoItem } from '../types/activity';
 
 interface ActivityTimelineProps {
@@ -7,6 +7,7 @@ interface ActivityTimelineProps {
   isAdmin: boolean;
   onSelectPhoto: (photo: PhotoItem, title: string, subtitle: string) => void;
   onSelectMountain: (mountainId: string) => void;
+  onEditActivity: (activity: Activity) => void;
   onDeleteActivity: (id: string) => void;
   initialFilter?: 'all' | 'summit' | 'running';
 }
@@ -16,6 +17,7 @@ export const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
   isAdmin,
   onSelectPhoto,
   onSelectMountain,
+  onEditActivity,
   onDeleteActivity,
   initialFilter = 'all',
 }) => {
@@ -309,14 +311,25 @@ export const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
                     )}
 
                     {isAdmin && (
-                      <button
-                        onClick={() => onDeleteActivity(act.id)}
-                        className="p-1.5 text-stone-500 hover:text-rose-400 hover:bg-rose-950/30 rounded-lg transition-colors"
-                        title="Delete activity"
-                        aria-label="Delete activity"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => onEditActivity(act)}
+                          className="px-2.5 py-1 text-xs font-medium text-stone-400 hover:text-amber-300 hover:bg-stone-800 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+                          title="Edit activity details and photos"
+                          aria-label="Edit activity"
+                        >
+                          <Edit className="w-3.5 h-3.5" />
+                          <span>Edit</span>
+                        </button>
+                        <button
+                          onClick={() => onDeleteActivity(act.id)}
+                          className="p-1.5 text-stone-500 hover:text-rose-400 hover:bg-rose-950/30 rounded-lg transition-colors cursor-pointer"
+                          title="Delete activity"
+                          aria-label="Delete activity"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>

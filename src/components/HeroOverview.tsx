@@ -61,7 +61,7 @@ export const HeroOverview: React.FC<HeroOverviewProps> = ({
                 className="px-4 py-2.5 text-sm font-medium text-stone-200 hover:text-white bg-stone-900 border border-stone-800 hover:border-stone-700 rounded-lg transition-colors inline-flex items-center gap-2"
               >
                 <Compass className="w-4 h-4 text-amber-400" />
-                <span>Korea 40+ Mountain Catalog</span>
+                <span>Korea 56+ Mountain Catalog</span>
               </button>
 
               {isAdmin && (
@@ -143,13 +143,13 @@ export const HeroOverview: React.FC<HeroOverviewProps> = ({
                 <div>
                   <div className="flex items-center justify-between text-xs font-mono text-amber-400 mb-2">
                     <span>Basecamp Ready</span>
-                    <span>40+ Mountains Cataloged</span>
+                    <span>56+ Peaks Cataloged</span>
                   </div>
                   <h3 className="text-xl font-bold text-stone-100 mb-2">
                     Expedition Tracker Online
                   </h3>
                   <p className="text-stone-400 text-xs sm:text-sm leading-relaxed mb-4">
-                    Select any mountain from South Korea's national parks, provincial peaks, and Seoul trails. Upload summit photos and see your repeat summit counter update automatically!
+                    Select any mountain from Busan, South Korea's national parks, provincial ridges, and alpine trails. Upload summit photos and see your repeat summit counter update automatically!
                   </p>
                   <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 text-xs font-mono text-stone-300 space-y-1.5">
                     <div className="flex justify-between">

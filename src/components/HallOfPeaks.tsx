@@ -52,7 +52,7 @@ export const HallOfPeaks: React.FC<HallOfPeaksProps> = ({
               className="px-3.5 py-1.5 rounded-xl bg-stone-900 border border-stone-800 hover:border-amber-400 text-stone-200 text-xs font-medium inline-flex items-center gap-1.5 transition-colors"
             >
               <Compass className="w-3.5 h-3.5 text-amber-400" />
-              <span>Korea Peak Catalog (40+)</span>
+              <span>Korea Peak Catalog (56+)</span>
             </button>
 
             {/* Region Filter Segmented Control */}
@@ -86,7 +86,7 @@ export const HallOfPeaks: React.FC<HallOfPeaksProps> = ({
               Expedition Log Ready
             </h3>
             <p className="text-stone-400 text-sm mb-6 leading-relaxed">
-              No summit ascents have been logged yet. Pick any peak from Korea's 40+ famous mountains database to record your date, photos, and trail details.
+              No summit ascents have been logged yet. Pick any peak from Korea's 56+ famous mountains database (including Busan, national parks, and provincial ridges) to record your date, photos, and trail details.
             </p>
             <div className="flex items-center justify-center gap-3">
               <button
