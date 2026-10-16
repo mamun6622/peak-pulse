@@ -3,6 +3,7 @@ import { Mountain, Flame, ArrowUpRight, Award, Compass, ChevronRight, Plus, Shie
 import { PersonalRecords, MountainSummary } from '../types/activity';
 
 interface HeroOverviewProps {
+  activeTab: string;
   records: PersonalRecords;
   topMountain: MountainSummary | undefined;
   isAdmin: boolean;
@@ -13,6 +14,7 @@ interface HeroOverviewProps {
 }
 
 export const HeroOverview: React.FC<HeroOverviewProps> = ({
+  activeTab,
   records,
   topMountain,
   isAdmin,
@@ -21,29 +23,61 @@ export const HeroOverview: React.FC<HeroOverviewProps> = ({
   onOpenLogModal,
   onOpenKoreaDirectory,
 }) => {
+  const tabHeaders: Record<string, { badge: string; title: string; desc: string }> = {
+    summits: {
+      badge: 'South Korea Summit Journal & Hall of Peaks',
+      title: 'Documenting Every Summit, Repeat Peak & River Mile',
+      desc: 'Personal mountaineering ascents and endurance runs across South Korea. Track repeat summit counts on each mountain with photo archives, ascent dates, and elevation gain.',
+    },
+    progress: {
+      badge: 'Korea & Regional Mountain Progression HUD',
+      title: 'Busan, Seoul, Gangwon, Gyeonggi, Gyeongnam, Ulsan, Gimhae & Geoje Explorer',
+      desc: 'Track your summit completion progress across all provinces, metropolitan cities, and the 100 Famous Mountains of South Korea.',
+    },
+    running: {
+      badge: 'Endurance Training & Riverfront Runs',
+      title: 'Cardio Workouts, Pace Analytics & Trail Miles',
+      desc: 'Log and analyze endurance running workouts, riverfront streams, trail runs, pacing metrics, and shoe mileage across South Korea.',
+    },
+    stats: {
+      badge: 'Performance & Elevation Analytics',
+      title: 'Monthly Vertical Gains & Ascent Statistics',
+      desc: 'Comprehensive breakdown of monthly mountaineering activity, total meters climbed, cumulative distance traveled, and personal mountaineering records.',
+    },
+    map: {
+      badge: 'Geographic GIS Map',
+      title: 'South Korea Summit & Coastal Ridge Map',
+      desc: 'Interactive geographic map of conquered peaks across the Korean peninsula and Jeju Island with repeat ascent pins.',
+    },
+    photos: {
+      badge: 'Expedition Visual Archive',
+      title: 'Compressed Photo Gallery & Lightbox Collection',
+      desc: "High-resolution visual memories, summit panoramas, and trail snapshots captured across South Korea's stunning peaks.",
+    },
+  };
+
+  const currentHeader = tabHeaders[activeTab] || tabHeaders.summits;
+
   return (
     <section className="border-b border-stone-800 bg-gradient-to-b from-stone-900/60 to-stone-950 pt-8 pb-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Split Screen Hero */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
-          {/* Left Column: Typographic Hierarchy */}
+          {/* Left Column: Dynamic Typographic Hierarchy */}
           <div className="lg:col-span-7 flex flex-col justify-center">
             {/* Clean metadata */}
             <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-amber-400 mb-3 tracking-wide">
-              <span>Seoul, South Korea</span>
+              <span>South Korea</span>
               <span aria-hidden="true" className="text-stone-600">·</span>
-              <span>Alpine & Trail Journal</span>
-              <span aria-hidden="true" className="text-stone-600">·</span>
-              <span>Korea's 100 Famous Mountains</span>
+              <span>{currentHeader.badge}</span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-stone-100 tracking-tight leading-[1.15] text-balance mb-4">
-              Documenting Every Summit, Repeat Peak & River Mile
+              {currentHeader.title}
             </h1>
 
             <p className="text-stone-300 text-base sm:text-lg leading-relaxed mb-6 max-w-2xl text-pretty">
-              Personal mountaineering ascents and endurance runs across South Korea.
-              Track repeat summit counts on each mountain with photo archives, ascent dates, elevation gain, and a progression ranking system.
+              {currentHeader.desc}
             </p>
 
             {/* CTAs */}
@@ -61,7 +95,7 @@ export const HeroOverview: React.FC<HeroOverviewProps> = ({
                 className="px-4 py-2.5 text-sm font-medium text-stone-200 hover:text-white bg-stone-900 border border-stone-800 hover:border-stone-700 rounded-lg transition-colors inline-flex items-center gap-2"
               >
                 <Compass className="w-4 h-4 text-amber-400" />
-                <span>Korea 56+ Mountain Catalog</span>
+                <span>Korea 60+ Mountain Catalog</span>
               </button>
 
               {isAdmin && (
@@ -143,18 +177,18 @@ export const HeroOverview: React.FC<HeroOverviewProps> = ({
                 <div>
                   <div className="flex items-center justify-between text-xs font-mono text-amber-400 mb-2">
                     <span>Basecamp Ready</span>
-                    <span>56+ Peaks Cataloged</span>
+                    <span>60+ Peaks Cataloged</span>
                   </div>
                   <h3 className="text-xl font-bold text-stone-100 mb-2">
                     Expedition Tracker Online
                   </h3>
                   <p className="text-stone-400 text-xs sm:text-sm leading-relaxed mb-4">
-                    Select any mountain from Busan, South Korea's national parks, provincial ridges, and alpine trails. Upload summit photos and see your repeat summit counter update automatically!
+                    Select any mountain from Busan, Ulsan, Gimhae, Geoje, national parks, and alpine trails. Upload summit photos and see your repeat summit counter update automatically!
                   </p>
                   <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 text-xs font-mono text-stone-300 space-y-1.5">
                     <div className="flex justify-between">
-                      <span className="text-stone-500">Seoul Peaks:</span>
-                      <span>Bukhansan, Inwangsan, Gwanaksan...</span>
+                      <span className="text-stone-500">Busan & Ulsan:</span>
+                      <span>Geumjeongsan, Jangsan, Munsusan...</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-stone-500">High Alpine:</span>

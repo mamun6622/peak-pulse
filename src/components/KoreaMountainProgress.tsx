@@ -32,12 +32,16 @@ const PROVINCE_CONFIG: {
   bgLight: string;
 }[] = [
   { key: 'Busan', label: 'Busan', koreanLabel: '부산광역시', icon: '🌊', accentColor: 'text-sky-400', bgLight: 'bg-sky-500/10' },
-  { key: 'Seoul', label: 'Seoul Capital Area', koreanLabel: '서울특별시', icon: '🏙️', accentColor: 'text-amber-400', bgLight: 'bg-amber-500/10' },
+  { key: 'Seoul', label: 'Seoul', koreanLabel: '서울특별시', icon: '🏙️', accentColor: 'text-amber-400', bgLight: 'bg-amber-500/10' },
   { key: 'Gangwon', label: 'Gangwon-do', koreanLabel: '강원도', icon: '🌲', accentColor: 'text-emerald-400', bgLight: 'bg-emerald-500/10' },
   { key: 'Gyeonggi', label: 'Gyeonggi-do', koreanLabel: '경기도', icon: '🌾', accentColor: 'text-teal-400', bgLight: 'bg-teal-500/10' },
   { key: 'Chungcheong', label: 'Chungcheong-do', koreanLabel: '충청도', icon: '🍁', accentColor: 'text-orange-400', bgLight: 'bg-orange-500/10' },
   { key: 'Jeolla', label: 'Jeolla-do', koreanLabel: '전라도', icon: '⛰️', accentColor: 'text-rose-400', bgLight: 'bg-rose-500/10' },
-  { key: 'Gyeongsang', label: 'Gyeongsang-do', koreanLabel: '경상도', icon: '🏞️', accentColor: 'text-indigo-400', bgLight: 'bg-indigo-500/10' },
+  { key: 'Gyeongnam', label: 'Gyeongnam', koreanLabel: '경상남도', icon: '🏞️', accentColor: 'text-indigo-400', bgLight: 'bg-indigo-500/10' },
+  { key: 'Gyeongbuk', label: 'Gyeongbuk', koreanLabel: '경상북도', icon: '⛰️', accentColor: 'text-violet-400', bgLight: 'bg-violet-500/10' },
+  { key: 'Ulsan', label: 'Ulsan', koreanLabel: '울산광역시', icon: '⚓', accentColor: 'text-cyan-400', bgLight: 'bg-cyan-500/10' },
+  { key: 'Gimhae', label: 'Gimhae', koreanLabel: '김해시', icon: '🏔️', accentColor: 'text-yellow-400', bgLight: 'bg-yellow-500/10' },
+  { key: 'Geoje', label: 'Geoje', koreanLabel: '거제시', icon: '🏝️', accentColor: 'text-teal-300', bgLight: 'bg-teal-500/10' },
   { key: 'Jeju', label: 'Jeju Island', koreanLabel: '제주특별자치도', icon: '🌋', accentColor: 'text-fuchsia-400', bgLight: 'bg-fuchsia-500/10' },
 ];
 

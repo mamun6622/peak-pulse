@@ -184,6 +184,14 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
   const selectedKoreaMountain =
     KOREA_ALL_MOUNTAINS.find((m) => m.id === selectedMountainId) || KOREA_ALL_MOUNTAINS[0];
 
+  // Auto-load elevation and estimated distance when selecting mountain
+  useEffect(() => {
+    if (!isEditing && !isCustomMountain && selectedKoreaMountain) {
+      setElevationGainM(selectedKoreaMountain.elevationM);
+      setDistanceKm(Math.max(4, Number((selectedKoreaMountain.elevationM / 100 + 3).toFixed(1)) ));
+    }
+  }, [selectedMountainId, isCustomMountain, isEditing]);
+
   // Check if user has past summits on this mountain
   const existingSummary = mountains.find(
     (m) =>
@@ -243,18 +251,23 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
     setIsCompressingPhotos(true);
     try {
       const fileList = Array.from(files);
-      for (const file of fileList) {
+      const newItems: PhotoItem[] = [];
+      for (let i = 0; i < fileList.length; i++) {
+        const file = fileList[i];
         // High quality web compression (~30-50KB per photo)
         const compressedUrl = await compressImageFile(file, 960, 960, 0.68);
         if (compressedUrl) {
-          const newPhoto: PhotoItem = {
-            id: `photo-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          const isFirstEver = uploadedPhotos.length === 0 && newItems.length === 0;
+          newItems.push({
+            id: `photo-${Date.now()}-${i}-${Math.random().toString(36).slice(2, 7)}`,
             url: compressedUrl,
             caption: photoCaptionInput.trim() || file.name.replace(/\.[^/.]+$/, ''),
-            isCover: uploadedPhotos.length === 0,
-          };
-          setUploadedPhotos((prev) => [...prev, newPhoto]);
+            isCover: isFirstEver,
+          });
         }
+      }
+      if (newItems.length > 0) {
+        setUploadedPhotos((prev) => [...prev, ...newItems]);
       }
       setPhotoCaptionInput('');
     } catch (err) {
@@ -507,7 +520,7 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
                   {/* Region filter chips */}
                   <div className="flex flex-wrap items-center gap-1.5 text-xs">
                     <span className="text-[11px] text-stone-500 mr-1">Region:</span>
-                    {['all', 'Busan', 'Seoul', 'Gangwon', 'Gyeonggi', 'Chungcheong', 'Jeolla', 'Gyeongsang', 'Jeju'].map(
+                    {['all', 'Busan', 'Seoul', 'Gangwon', 'Gyeonggi', 'Chungcheong', 'Jeolla', 'Gyeongnam', 'Gyeongbuk', 'Ulsan', 'Gimhae', 'Geoje', 'Jeju'].map(
                       (prov) => (
                         <button
                           key={prov}
@@ -627,6 +640,20 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
                     <option value="Sunset Golden Hour">Sunset Golden Hour 🌇</option>
                   </select>
                 </div>
+              </div>
+
+              <div>
+                <label className="text-[11px] text-stone-400 block mb-1">Companions / Ascent Style</label>
+                <select
+                  value={companions}
+                  onChange={(e) => setCompanions(e.target.value as any)}
+                  className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-stone-100 focus:outline-none focus:border-amber-400"
+                >
+                  <option value="Solo">Solo Ascent 🧗</option>
+                  <option value="With Friends / Family">With Friends / Family 👥</option>
+                  <option value="With Hiking Club">With Hiking Club 🏔️</option>
+                  <option value="Guided Expedition">Guided Expedition 🧭</option>
+                </select>
               </div>
             </div>
           )}
@@ -773,34 +800,48 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
                   {uploadedPhotos.map((photo) => (
                     <div
                       key={photo.id}
-                      className="relative group rounded-xl overflow-hidden border border-stone-800 aspect-square bg-stone-950"
+                      className={`relative group rounded-xl overflow-hidden border aspect-square bg-stone-950 flex flex-col justify-between p-2 transition-all ${
+                        photo.isCover ? 'border-amber-400 ring-2 ring-amber-400/30' : 'border-stone-800'
+                      }`}
                     >
                       <img
                         src={photo.url}
                         alt={photo.caption || 'Photo'}
-                        className="w-full h-full object-cover"
+                        className="absolute inset-0 w-full h-full object-cover"
                       />
-                      <div className="absolute inset-0 bg-stone-950/60 opacity-0 group-hover:opacity-100 transition-opacity p-2 flex flex-col justify-between">
-                        <div className="flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => removePhoto(photo.id)}
-                            className="p-1 rounded bg-rose-500/80 text-white hover:bg-rose-600 transition-colors cursor-pointer"
-                            title="Remove photo"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
+                      <div className="absolute inset-0 bg-stone-950/30 group-hover:bg-stone-950/40 transition-colors pointer-events-none" />
+
+                      {/* Top Bar: Cover Badge and Remove Button */}
+                      <div className="relative z-10 flex items-center justify-between w-full">
+                        {photo.isCover ? (
+                          <span className="px-2 py-0.5 rounded-md bg-amber-400 text-stone-950 text-[10px] font-extrabold shadow flex items-center gap-1">
+                            ★ Cover
+                          </span>
+                        ) : (
+                          <span />
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removePhoto(photo.id)}
+                          className="p-1 rounded-md bg-rose-600/90 text-white hover:bg-rose-500 transition-colors cursor-pointer shadow"
+                          title="Remove photo"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Bottom Button: Set Cover */}
+                      <div className="relative z-10 w-full">
                         <button
                           type="button"
                           onClick={() => toggleCoverPhoto(photo.id)}
-                          className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-colors cursor-pointer text-center ${
+                          className={`w-full py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer shadow text-center ${
                             photo.isCover
                               ? 'bg-amber-400 text-stone-950 font-bold'
-                              : 'bg-stone-800 text-stone-300 hover:bg-stone-700'
+                              : 'bg-stone-900/90 text-stone-200 hover:bg-amber-400 hover:text-stone-950 border border-stone-700/80 backdrop-blur-sm'
                           }`}
                         >
-                          {photo.isCover ? '★ Cover' : 'Set Cover'}
+                          {photo.isCover ? '★ Selected Cover' : 'Set as Cover'}
                         </button>
                       </div>
                     </div>

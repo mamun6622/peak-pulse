@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, MapPin, Camera, Clock, Route, Compass, Plus, Mountain, ChevronRight, Layers, Edit, Trash2 } from 'lucide-react';
+import { X, Calendar, MapPin, Camera, Clock, Route, Compass, Plus, Mountain, ChevronRight, Layers, Edit, Trash2, Star } from 'lucide-react';
 import { MountainSummary, SummitLog, PhotoItem } from '../types/activity';
 
 interface MountainDetailModalProps {
@@ -10,6 +10,7 @@ interface MountainDetailModalProps {
   onLogNextSummit: (mountain: MountainSummary) => void;
   onEditSummit?: (summit: SummitLog) => void;
   onDeleteSummit?: (id: string) => void;
+  onSetCoverPhoto?: (photoId: string, summitId: string) => void;
 }
 
 export const MountainDetailModal: React.FC<MountainDetailModalProps> = ({
@@ -20,6 +21,7 @@ export const MountainDetailModal: React.FC<MountainDetailModalProps> = ({
   onLogNextSummit,
   onEditSummit,
   onDeleteSummit,
+  onSetCoverPhoto,
 }) => {
   const [activeTab, setActiveTab] = useState<'summits' | 'photos' | 'routes'>('summits');
 
@@ -209,28 +211,57 @@ export const MountainDetailModal: React.FC<MountainDetailModalProps> = ({
                   {/* Photos for this specific summit */}
                   {summit.photos && summit.photos.length > 0 && (
                     <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                      {summit.photos.map((photo) => (
-                        <div
-                          key={photo.id}
-                          onClick={() => onSelectPhoto(photo, `${mountain.mountainName} · Summit #${summit.summitNumber}`, summit.date)}
-                          className="group/photo relative aspect-[4/3] rounded-lg overflow-hidden border border-stone-800 bg-stone-900 cursor-pointer"
-                        >
-                          <img
-                            src={photo.url}
-                            alt={photo.caption || `${mountain.mountainName} photo`}
-                            className="w-full h-full object-cover group-hover/photo:scale-105 transition-transform duration-200"
-                            referrerPolicy="no-referrer"
-                          />
-                          <div className="absolute inset-0 bg-stone-950/0 group-hover/photo:bg-stone-950/30 transition-colors flex items-center justify-center">
-                            <Camera className="w-4 h-4 text-white opacity-0 group-hover/photo:opacity-100 transition-opacity" />
-                          </div>
-                          {photo.caption && (
-                            <div className="absolute bottom-0 inset-x-0 p-1.5 bg-stone-950/80 text-[10px] text-stone-300 truncate">
-                              {photo.caption}
+                      {summit.photos.map((photo) => {
+                        const isCover = photo.isCover || (mountain.coverPhoto === photo.url);
+                        return (
+                          <div
+                            key={photo.id}
+                            className={`group/photo relative aspect-[4/3] rounded-lg overflow-hidden border bg-stone-900 ${
+                              isCover ? 'border-amber-400 ring-2 ring-amber-400/30' : 'border-stone-800'
+                            }`}
+                          >
+                            <img
+                              src={photo.url}
+                              alt={photo.caption || `${mountain.mountainName} photo`}
+                              onClick={() => onSelectPhoto(photo, `${mountain.mountainName} · Summit #${summit.summitNumber}`, summit.date)}
+                              className="w-full h-full object-cover group-hover/photo:scale-105 transition-transform duration-200 cursor-pointer"
+                              referrerPolicy="no-referrer"
+                            />
+
+                            {/* Cover Badge / Set Cover Button */}
+                            <div className="absolute top-1.5 left-1.5 z-10 flex items-center gap-1">
+                              {isCover ? (
+                                <span className="px-1.5 py-0.5 rounded bg-amber-400 text-stone-950 font-bold text-[9px] shadow flex items-center gap-0.5">
+                                  <Star className="w-2.5 h-2.5 fill-stone-950" />
+                                  <span>Cover</span>
+                                </span>
+                              ) : isAdmin && onSetCoverPhoto ? (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onSetCoverPhoto(photo.id, summit.id);
+                                  }}
+                                  className="opacity-0 group-hover/photo:opacity-100 px-1.5 py-0.5 rounded bg-stone-950/90 hover:bg-amber-400 hover:text-stone-950 text-stone-200 font-medium text-[9px] border border-stone-700 shadow transition-all cursor-pointer"
+                                  title="Set this photo as the mountain cover thumbnail"
+                                >
+                                  Set Cover
+                                </button>
+                              ) : null}
                             </div>
-                          )}
-                        </div>
-                      ))}
+
+                            <div
+                              onClick={() => onSelectPhoto(photo, `${mountain.mountainName} · Summit #${summit.summitNumber}`, summit.date)}
+                              className="absolute inset-0 bg-stone-950/0 group-hover/photo:bg-stone-950/20 transition-colors cursor-pointer"
+                            />
+                            {photo.caption && (
+                              <div className="absolute bottom-0 inset-x-0 p-1.5 bg-stone-950/80 text-[10px] text-stone-300 truncate pointer-events-none">
+                                {photo.caption}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -248,29 +279,63 @@ export const MountainDetailModal: React.FC<MountainDetailModalProps> = ({
                 </div>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  {allPhotos.map(({ photo, summit }) => (
-                    <div
-                      key={photo.id}
-                      onClick={() => onSelectPhoto(photo, `${mountain.mountainName} · Summit #${summit.summitNumber}`, summit.date)}
-                      className="group relative aspect-[4/3] rounded-xl overflow-hidden border border-stone-800 bg-stone-950 cursor-pointer"
-                    >
-                      <img
-                        src={photo.url}
-                        alt={photo.caption}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        referrerPolicy="no-referrer"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
-                      <div className="absolute bottom-2 left-2 right-2 text-left">
-                        <div className="text-[11px] font-mono text-amber-400">
-                          Summit #{summit.summitNumber} · {summit.date}
+                  {allPhotos.map(({ photo, summit }) => {
+                    const isCover = photo.isCover || (mountain.coverPhoto === photo.url);
+                    return (
+                      <div
+                        key={photo.id}
+                        className={`group relative aspect-[4/3] rounded-xl overflow-hidden border bg-stone-950 ${
+                          isCover ? 'border-amber-400 ring-2 ring-amber-400/30' : 'border-stone-800'
+                        }`}
+                      >
+                        <img
+                          src={photo.url}
+                          alt={photo.caption}
+                          onClick={() => onSelectPhoto(photo, `${mountain.mountainName} · Summit #${summit.summitNumber}`, summit.date)}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
+                          referrerPolicy="no-referrer"
+                        />
+                        <div
+                          onClick={() => onSelectPhoto(photo, `${mountain.mountainName} · Summit #${summit.summitNumber}`, summit.date)}
+                          className="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity cursor-pointer"
+                        />
+
+                        {/* Cover Badge or Set Button */}
+                        <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5">
+                          {isCover ? (
+                            <span className="px-2 py-0.5 rounded-md bg-amber-400 text-stone-950 font-bold text-[10px] shadow flex items-center gap-1">
+                              <Star className="w-3 h-3 fill-stone-950" />
+                              <span>Mountain Cover</span>
+                            </span>
+                          ) : isAdmin && onSetCoverPhoto ? (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onSetCoverPhoto(photo.id, summit.id);
+                              }}
+                              className="px-2 py-0.5 rounded-md bg-stone-950/90 hover:bg-amber-400 hover:text-stone-950 text-stone-200 font-medium text-[10px] border border-stone-700/80 shadow transition-all cursor-pointer backdrop-blur-sm"
+                              title="Set as mountain thumbnail cover"
+                            >
+                              ★ Set as Cover
+                            </button>
+                          ) : null}
                         </div>
-                        <div className="text-xs text-stone-200 truncate font-medium">
-                          {photo.caption || 'Summit capture'}
+
+                        <div
+                          onClick={() => onSelectPhoto(photo, `${mountain.mountainName} · Summit #${summit.summitNumber}`, summit.date)}
+                          className="absolute bottom-2 left-2 right-2 text-left cursor-pointer pointer-events-none"
+                        >
+                          <div className="text-[11px] font-mono text-amber-400">
+                            Summit #{summit.summitNumber} · {summit.date}
+                          </div>
+                          <div className="text-xs text-stone-200 truncate font-medium">
+                            {photo.caption || 'Summit capture'}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

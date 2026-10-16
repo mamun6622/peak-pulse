@@ -46,6 +46,7 @@ async function prepareActivityForFirestore(activity: Activity): Promise<Record<s
     id: activity.id,
     activityType: activity.activityType,
     date: activity.date,
+    startTime: activity.startTime || '07:30',
     durationMinutes: Number(activity.durationMinutes) || 0,
     distanceKm: Number(activity.distanceKm) || 0,
     elevationGainM: Number(activity.elevationGainM) || 0,
@@ -150,7 +151,7 @@ export async function saveActivityToFirestore(activity: Activity): Promise<void>
     await setDoc(doc(db, ACTIVITIES_COLLECTION, activity.id), data, { merge: true });
     console.log(`Successfully saved activity ${activity.id} to Firestore!`);
   } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, docPath);
+    console.warn(`Firestore save warning for ${docPath}:`, error);
   }
 }
 
@@ -163,7 +164,7 @@ export async function deleteActivityFromFirestore(activityId: string): Promise<v
     await deleteDoc(doc(db, ACTIVITIES_COLLECTION, activityId));
     console.log(`Successfully deleted activity ${activityId} from Firestore!`);
   } catch (error) {
-    handleFirestoreError(error, OperationType.DELETE, docPath);
+    console.warn(`Firestore delete warning for ${docPath}:`, error);
   }
 }
 

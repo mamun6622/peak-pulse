@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Activity, MountainSummary, PhotoItem, SummitLog } from './types/activity';
+import { Activity, MountainSummary, PhotoItem, SummitLog, RunningLog } from './types/activity';
 import { loadActivities, initStorage, addActivity, updateActivity, deleteActivity, saveActivities } from './services/storageService';
 import {
   subscribeToFirestoreActivities,
@@ -31,7 +31,7 @@ import { DataManagementModal } from './components/DataManagementModal';
 import { AdminAuthModal } from './components/AdminAuthModal';
 import { KoreaMountainsModal } from './components/KoreaMountainsModal';
 import { KoreaMountainProgress } from './components/KoreaMountainProgress';
-import { Mountain, ShieldCheck, CheckCircle2, AlertCircle, Flame } from 'lucide-react';
+import { Mountain, ShieldCheck, CheckCircle2, AlertCircle, Flame, Trash2 } from 'lucide-react';
 
 export default function App() {
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -51,6 +51,7 @@ export default function App() {
   const [isDataModalOpen, setIsDataModalOpen] = useState<boolean>(false);
   const [isAdminAuthOpen, setIsAdminAuthOpen] = useState<boolean>(false);
   const [isKoreaDirectoryOpen, setIsKoreaDirectoryOpen] = useState<boolean>(false);
+  const [activityPendingDelete, setActivityPendingDelete] = useState<{ id: string; name: string } | null>(null);
   const [lightboxData, setLightboxData] = useState<{
     photo: PhotoItem;
     title: string;
@@ -173,6 +174,7 @@ export default function App() {
   // Edit Activity Trigger
   const handleStartEditActivity = (act: Activity) => {
     if (!isAdmin) {
+      showToast('Admin authentication required. Please sign in with Google or Owner Passkey.', 'error');
       setIsAdminAuthOpen(true);
       return;
     }
@@ -181,23 +183,101 @@ export default function App() {
     setIsLogModalOpen(true);
   };
 
-  // Delete Activity Trigger
-  const handleDeleteActivity = async (id: string) => {
+  // Delete Activity Handlers (Native UI without window.confirm)
+  const promptDeleteActivity = (id: string, name?: string) => {
     if (!isAdmin) {
+      showToast('Admin authentication required. Please sign in with Google or Owner Passkey.', 'error');
       setIsAdminAuthOpen(true);
       return;
     }
-    if (window.confirm('Are you sure you want to delete this activity log from your journal and database?')) {
-      const updated = deleteActivity(id);
-      setActivities(updated);
+    const act = activities.find((a) => a.id === id);
+    const title =
+      name ||
+      (act?.activityType === 'summit'
+        ? `${act.mountainName} (${act.peakName} · Summit #${act.summitNumber})`
+        : (act as RunningLog)?.title) ||
+      'this activity';
+    setActivityPendingDelete({ id, name: title });
+  };
 
-      try {
-        await deleteActivityFromFirestore(id);
-        showToast('Activity deleted from journal and Cloud Firestore database.');
-      } catch (err) {
-        console.warn('Deleted locally, Firestore note:', err);
-        showToast('Deleted locally.', 'info');
+  const executeDeleteActivity = async () => {
+    if (!activityPendingDelete) return;
+    const { id } = activityPendingDelete;
+    setActivityPendingDelete(null);
+
+    // 1. Immediately delete from local storage & memory cache
+    const updated = deleteActivity(id);
+    setActivities(updated);
+
+    // 2. Delete from Firestore cloud database asynchronously
+    try {
+      await deleteActivityFromFirestore(id);
+      showToast('Activity successfully deleted from journal and Cloud Firestore database!', 'success');
+    } catch (err) {
+      console.warn('Deleted locally, Firestore note:', err);
+      showToast('Activity deleted from journal.', 'info');
+    }
+
+    // 3. If MountainDetailModal is currently open, check if this mountain still has remaining summits
+    if (selectedMountainId) {
+      const remainingSummits = updated.filter(
+        (a): a is SummitLog => a.activityType === 'summit'
+      );
+      const summaries = calculateMountainSummaries(remainingSummits);
+      const stillHasSummits = summaries.some((s) => s.mountainId === selectedMountainId);
+      if (!stillHasSummits) {
+        setSelectedMountainId(null);
       }
+    }
+  };
+
+  // Set Mountain Cover Photo Handler
+  const handleSetCoverPhoto = async (photoId: string, summitId: string) => {
+    if (!isAdmin) {
+      showToast('Admin authentication required to set cover photo.', 'error');
+      return;
+    }
+
+    const targetSummit = activities.find((a) => a.id === summitId) as SummitLog | undefined;
+    if (!targetSummit || targetSummit.activityType !== 'summit') return;
+
+    const mId = targetSummit.mountainId;
+    const mName = targetSummit.mountainName.toLowerCase().trim();
+
+    // Mark the selected photo as isCover: true, and unmark all others for this mountain
+    const updated = activities.map((act) => {
+      if (
+        act.activityType === 'summit' &&
+        (act.mountainId === mId || act.mountainName.toLowerCase().trim() === mName)
+      ) {
+        const updatedPhotos = (act.photos || []).map((p) => ({
+          ...p,
+          isCover: p.id === photoId,
+        }));
+        return {
+          ...act,
+          photos: updatedPhotos,
+        };
+      }
+      return act;
+    });
+
+    setActivities(updated);
+    saveActivities(updated);
+
+    try {
+      const mountainSummits = updated.filter(
+        (a): a is SummitLog =>
+          a.activityType === 'summit' &&
+          (a.mountainId === mId || a.mountainName.toLowerCase().trim() === mName)
+      );
+      for (const s of mountainSummits) {
+        await saveActivityToFirestore(s);
+      }
+      showToast(`Cover thumbnail updated for ${targetSummit.mountainName}!`, 'success');
+    } catch (err) {
+      console.warn('Cover photo Firestore sync note:', err);
+      showToast(`Cover thumbnail updated for ${targetSummit.mountainName}!`, 'info');
     }
   };
 
@@ -260,27 +340,32 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex-1">
-        {/* Hero Section */}
-        <HeroOverview
-          records={personalRecords}
-          topMountain={topMountain}
-          isAdmin={isAdmin}
-          onSelectMountain={handleSelectMountain}
-          onExploreSummits={() => {
-            setActiveTab('summits');
-            const el = document.getElementById('hall-of-peaks');
-            el?.scrollIntoView({ behavior: 'smooth' });
-          }}
-          onOpenLogModal={handleOpenGeneralLogModal}
-          onOpenKoreaDirectory={() => setIsKoreaDirectoryOpen(true)}
-        />
+        {/* Hero Section - Only on Mountain Summits view */}
+        {activeTab === 'summits' && (
+          <HeroOverview
+            activeTab={activeTab}
+            records={personalRecords}
+            topMountain={topMountain}
+            isAdmin={isAdmin}
+            onSelectMountain={handleSelectMountain}
+            onExploreSummits={() => {
+              setActiveTab('summits');
+              const el = document.getElementById('hall-of-peaks');
+              el?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            onOpenLogModal={handleOpenGeneralLogModal}
+            onOpenKoreaDirectory={() => setIsKoreaDirectoryOpen(true)}
+          />
+        )}
 
-        {/* Progression & Achievement HUD System */}
-        <ProgressionHUD
-          stats={progressionStats}
-          totalKoreaMountainsCount={KOREA_ALL_MOUNTAINS.length}
-          uniqueSummitedCount={mountainSummaries.length}
-        />
+        {/* Progression & Achievement HUD System - Only on Mountain Summits view */}
+        {activeTab === 'summits' && (
+          <ProgressionHUD
+            stats={progressionStats}
+            totalKoreaMountainsCount={KOREA_ALL_MOUNTAINS.length}
+            uniqueSummitedCount={mountainSummaries.length}
+          />
+        )}
 
         {/* TAB 1: Mountain Summits */}
         {activeTab === 'summits' && (
@@ -299,7 +384,7 @@ export default function App() {
               onSelectPhoto={handleSelectPhoto}
               onSelectMountain={handleSelectMountain}
               onEditActivity={handleStartEditActivity}
-              onDeleteActivity={handleDeleteActivity}
+              onDeleteActivity={promptDeleteActivity}
               initialFilter="summit"
             />
           </>
@@ -334,7 +419,7 @@ export default function App() {
             onSelectPhoto={handleSelectPhoto}
             onSelectMountain={handleSelectMountain}
             onEditActivity={handleStartEditActivity}
-            onDeleteActivity={handleDeleteActivity}
+            onDeleteActivity={promptDeleteActivity}
             initialFilter="running"
           />
         )}
@@ -367,6 +452,50 @@ export default function App() {
 
       {/* MODALS */}
 
+      {/* Delete Confirmation Modal (Native UI without window.confirm) */}
+      {activityPendingDelete && (
+        <div
+          className="fixed inset-0 z-[70] bg-stone-950/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="relative w-full max-w-md bg-stone-900 border border-stone-800 rounded-2xl p-6 shadow-2xl flex flex-col items-center text-center">
+            <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center mb-4 shadow-lg shadow-rose-950/40">
+              <Trash2 className="w-7 h-7" />
+            </div>
+
+            <h3 className="text-xl font-bold text-stone-100 mb-1">
+              Delete Ascent Log?
+            </h3>
+            <p className="text-amber-400 font-semibold text-sm mb-3">
+              "{activityPendingDelete.name}"
+            </p>
+
+            <p className="text-stone-400 text-xs sm:text-sm leading-relaxed mb-6">
+              Are you sure you want to permanently delete this log? This will recalculate your summit counts, update your stats, and remove the entry from Cloud Firestore.
+            </p>
+
+            <div className="flex items-center gap-3 w-full">
+              <button
+                type="button"
+                onClick={() => setActivityPendingDelete(null)}
+                className="flex-1 py-2.5 px-4 bg-stone-800 hover:bg-stone-750 text-stone-300 font-medium rounded-xl text-xs sm:text-sm transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={executeDeleteActivity}
+                className="flex-1 py-2.5 px-4 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Delete Permanently</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mountain Detail Modal with Repeat Ascents & Edit/Delete */}
       {currentSelectedMountain && (
         <MountainDetailModal
@@ -383,8 +512,9 @@ export default function App() {
             handleStartEditActivity(summit);
           }}
           onDeleteSummit={(id: string) => {
-            handleDeleteActivity(id);
+            promptDeleteActivity(id);
           }}
+          onSetCoverPhoto={handleSetCoverPhoto}
         />
       )}
 

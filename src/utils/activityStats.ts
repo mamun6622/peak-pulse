@@ -18,10 +18,15 @@ export function calculateMountainSummaries(activities: Activity[]): MountainSumm
   const summaries: MountainSummary[] = [];
 
   for (const [, list] of groupMap.entries()) {
-    // Sort summits chronologically
+    // Sort summits chronologically ascending
     const sortedSummits = [...list].sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
+
+    // Dynamically assign summitNumber chronologically by date order
+    sortedSummits.forEach((s, idx) => {
+      s.summitNumber = idx + 1;
+    });
 
     const ref = sortedSummits[sortedSummits.length - 1]; // latest summit for metadata
     const first = sortedSummits[0];
@@ -30,12 +35,25 @@ export function calculateMountainSummaries(activities: Activity[]): MountainSumm
     const totalElevationGainedM = sortedSummits.reduce((acc, s) => acc + (s.elevationGainM || 0), 0);
     const photoCount = sortedSummits.reduce((acc, s) => acc + (s.photos?.length || 0), 0);
 
-    // Pick first available photo as cover
+    // Pick cover photo: prioritize photo with isCover === true (newest summit takes precedence)
     let coverPhoto: string | undefined;
-    for (const s of sortedSummits.slice().reverse()) {
+    const reversedSummits = [...sortedSummits].reverse();
+    for (const s of reversedSummits) {
       if (s.photos && s.photos.length > 0) {
-        coverPhoto = s.photos[0].url;
-        break;
+        const markedCover = s.photos.find((p) => p.isCover);
+        if (markedCover) {
+          coverPhoto = markedCover.url;
+          break;
+        }
+      }
+    }
+    // Fallback: if no photo is marked isCover, use the first photo from the most recent summit
+    if (!coverPhoto) {
+      for (const s of reversedSummits) {
+        if (s.photos && s.photos.length > 0) {
+          coverPhoto = s.photos[0].url;
+          break;
+        }
       }
     }
 
