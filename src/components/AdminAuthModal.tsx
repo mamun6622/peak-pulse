@@ -125,49 +125,49 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-stone-950/85 backdrop-blur-md flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
     >
-      <div className="relative w-full max-w-md bg-stone-900 border border-stone-800 rounded-2xl shadow-2xl p-6 overflow-hidden">
+      <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 overflow-hidden">
         {/* Glow decoration */}
-        <div className="absolute top-0 right-0 w-36 h-36 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-36 h-36 bg-accent-subtle rounded-full blur-2xl pointer-events-none" />
 
-        <div className="flex items-center justify-between pb-4 border-b border-stone-800 mb-5">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+            <div className="w-8 h-8 rounded-lg bg-accent-subtle border border-accent-border flex items-center justify-center text-accent">
               {isAdmin ? <ShieldCheck className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
             </div>
             <div>
-              <h3 className="text-sm font-bold text-stone-100 flex items-center gap-1.5">
+              <h3 className="text-sm font-bold text-slate-100 flex items-center gap-1.5">
                 <span>{isAdmin ? 'Security & Firebase' : 'Owner Admin Access'}</span>
                 <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/30">
                   <Flame className="w-3 h-3 text-orange-400" /> Firebase
                 </span>
               </h3>
-              <p className="text-[11px] text-stone-400">
+              <p className="text-[11px] text-slate-400">
                 {isAdmin ? 'Manage authentication & cloud sync' : 'Restricted private access for portfolio owner'}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-stone-400 hover:text-white rounded-lg transition-colors"
+            className="p-1.5 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Navigation tabs */}
-        <div className="flex gap-1 mb-4 p-1 bg-stone-950 border border-stone-800 rounded-xl text-xs font-medium">
+        <div className="flex gap-1 mb-4 p-1 bg-slate-950 border border-slate-800 rounded-xl text-xs font-medium">
           {!isAdmin && (
             <button
               type="button"
               onClick={() => setActiveTab('login')}
-              className={`flex-1 py-1.5 rounded-lg transition-colors text-center ${
+              className={`flex-1 py-1.5 rounded-lg transition-colors text-center cursor-pointer ${
                 activeTab === 'login'
-                  ? 'bg-amber-400 text-stone-950 font-bold'
-                  : 'text-stone-400 hover:text-stone-200'
+                  ? 'bg-accent text-slate-950 font-bold'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               Owner Login
@@ -176,10 +176,10 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('firebase')}
-            className={`flex-1 py-1.5 rounded-lg transition-colors text-center ${
+            className={`flex-1 py-1.5 rounded-lg transition-colors text-center cursor-pointer ${
               activeTab === 'firebase'
-                ? 'bg-amber-400 text-stone-950 font-bold'
-                : 'text-stone-400 hover:text-stone-200'
+                ? 'bg-accent text-slate-950 font-bold'
+                : 'text-slate-400 hover:text-slate-200'
             }`}
           >
             Firebase Auth
@@ -188,10 +188,10 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab('change_key')}
-              className={`flex-1 py-1.5 rounded-lg transition-colors text-center ${
+              className={`flex-1 py-1.5 rounded-lg transition-colors text-center cursor-pointer ${
                 activeTab === 'change_key'
-                  ? 'bg-amber-400 text-stone-950 font-bold'
-                  : 'text-stone-400 hover:text-stone-200'
+                  ? 'bg-accent text-slate-950 font-bold'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               Private Passkey
@@ -241,15 +241,15 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
                       className="w-10 h-10 rounded-full border border-stone-700"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+                    <div className="w-10 h-10 rounded-full bg-accent-subtle text-accent flex items-center justify-center font-bold">
                       {currentUser.displayName ? currentUser.displayName[0] : 'U'}
                     </div>
                   )}
                   <div className="overflow-hidden">
-                    <p className="text-xs font-bold text-stone-100 truncate">
+                    <p className="text-xs font-bold text-slate-100 truncate">
                       {currentUser.displayName || 'Authenticated User'}
                     </p>
-                    <p className="text-[11px] text-stone-400 truncate">{currentUser.email}</p>
+                    <p className="text-[11px] text-slate-400 truncate">{currentUser.email}</p>
                   </div>
                 </div>
 
@@ -257,14 +257,14 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
                   <button
                     type="button"
                     onClick={handleFirebaseSignOut}
-                    className="flex-1 py-2 px-3 text-xs font-medium text-stone-300 hover:text-white bg-stone-800/80 hover:bg-stone-800 rounded-xl border border-stone-700 flex items-center justify-center gap-1.5 transition-colors"
+                    className="flex-1 py-2 px-3 text-xs font-medium text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 rounded-xl border border-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <LogOut className="w-3.5 h-3.5" /> Sign Out from Firebase
                   </button>
                   <button
                     type="button"
                     onClick={onClose}
-                    className="py-2 px-4 text-xs font-semibold text-stone-950 bg-amber-400 hover:bg-amber-300 rounded-xl transition-all"
+                    className="py-2 px-4 text-xs font-semibold bg-accent hover:bg-accent-hover text-slate-950 rounded-xl transition-all cursor-pointer"
                   >
                     Done
                   </button>
@@ -272,14 +272,14 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
               </div>
             ) : (
               <div className="space-y-3">
-                <p className="text-xs text-stone-300 leading-relaxed">
+                <p className="text-xs text-slate-300 leading-relaxed">
                   Sign in with your Google account to sync your summit logs, photos, and running workouts securely to Firestore Cloud.
                 </p>
                 <button
                   type="button"
                   onClick={handleGoogleSignIn}
                   disabled={isSigningInWithGoogle}
-                  className="w-full py-2.5 px-4 bg-white hover:bg-stone-100 text-stone-900 text-xs font-semibold rounded-xl flex items-center justify-center gap-2.5 shadow-md transition-all disabled:opacity-50 cursor-pointer"
+                  className="w-full py-2.5 px-4 bg-white hover:bg-slate-100 text-slate-900 text-xs font-semibold rounded-xl flex items-center justify-center gap-2.5 shadow-md transition-all disabled:opacity-50 cursor-pointer"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24">
                     <path
@@ -317,7 +317,7 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
             )}
 
             <div>
-              <label className="text-[11px] font-medium text-stone-300 block mb-1">
+              <label className="text-[11px] font-medium text-slate-300 block mb-1">
                 Current Passkey
               </label>
               <input
@@ -325,12 +325,12 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
                 placeholder="Enter current passkey"
                 value={currentKeyInput}
                 onChange={(e) => setCurrentKeyInput(e.target.value)}
-                className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs sm:text-sm text-stone-100 placeholder:text-stone-600 focus:outline-none focus:border-amber-400 font-mono"
+                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs sm:text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-accent font-mono"
               />
             </div>
 
             <div>
-              <label className="text-[11px] font-medium text-stone-300 block mb-1">
+              <label className="text-[11px] font-medium text-slate-300 block mb-1">
                 New Private Passkey (Only you know this)
               </label>
               <input
@@ -338,12 +338,12 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
                 placeholder="Enter new private passkey"
                 value={newKeyInput}
                 onChange={(e) => setNewKeyInput(e.target.value)}
-                className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs sm:text-sm text-stone-100 placeholder:text-stone-600 focus:outline-none focus:border-amber-400 font-mono"
+                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs sm:text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-accent font-mono"
               />
             </div>
 
             <div>
-              <label className="text-[11px] font-medium text-stone-300 block mb-1">
+              <label className="text-[11px] font-medium text-slate-300 block mb-1">
                 Confirm New Passkey
               </label>
               <input
@@ -351,7 +351,7 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
                 placeholder="Repeat new private passkey"
                 value={confirmKeyInput}
                 onChange={(e) => setConfirmKeyInput(e.target.value)}
-                className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs sm:text-sm text-stone-100 placeholder:text-stone-600 focus:outline-none focus:border-amber-400 font-mono"
+                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs sm:text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-accent font-mono"
               />
             </div>
 
@@ -359,13 +359,13 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-3 py-2 text-xs font-medium text-stone-400 hover:text-stone-200"
+                className="px-3 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 cursor-pointer"
               >
                 Close
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 text-xs font-semibold text-stone-950 bg-amber-400 hover:bg-amber-300 rounded-xl transition-all shadow-sm"
+                className="px-4 py-2 text-xs font-semibold bg-accent hover:bg-accent-hover text-slate-950 rounded-xl transition-all shadow-sm cursor-pointer"
               >
                 Save Private Passkey
               </button>
@@ -377,11 +377,11 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
         {activeTab === 'login' && !isAdmin && (
           <form onSubmit={handleLoginSubmit} className="space-y-4">
             <div>
-              <label className="text-xs font-medium text-stone-300 block mb-1.5">
+              <label className="text-xs font-medium text-slate-300 block mb-1.5">
                 Owner Passkey
               </label>
               <div className="relative">
-                <KeyRound className="w-4 h-4 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                <KeyRound className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter private passkey..."
@@ -391,28 +391,28 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
                     if (error) setError('');
                   }}
                   autoFocus
-                  className="w-full pl-9 pr-10 py-2.5 bg-stone-950 border border-stone-800 rounded-xl text-sm text-stone-100 placeholder:text-stone-600 focus:outline-none focus:border-amber-400 font-mono"
+                  className="w-full pl-9 pr-10 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-accent font-mono"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="p-1.5 text-stone-500 hover:text-stone-300 absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md"
+                  className="p-1.5 text-slate-500 hover:text-slate-300 absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md cursor-pointer"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <p className="text-[11px] text-stone-500 mt-2">
+              <p className="text-[11px] text-slate-500 mt-2">
                 🔒 Public viewers have read-only access. Only the portfolio owner can sign in.
               </p>
             </div>
 
             <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-stone-800" />
+                <div className="w-full border-t border-slate-800" />
               </div>
               <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-wider">
-                <span className="bg-stone-900 px-2 text-stone-500">Or authenticate with</span>
+                <span className="bg-slate-900 px-2 text-slate-500">Or authenticate with</span>
               </div>
             </div>
 
@@ -420,7 +420,7 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
               type="button"
               onClick={handleGoogleSignIn}
               disabled={isSigningInWithGoogle}
-              className="w-full py-2.5 px-3 bg-stone-800 hover:bg-stone-700/80 border border-stone-700 text-stone-200 text-xs font-medium rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
+              className="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-slate-200 text-xs font-medium rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
               <Flame className="w-3.5 h-3.5 text-orange-400" />
               <span>{isSigningInWithGoogle ? 'Connecting...' : 'Sign in with Google (Firebase)'}</span>
@@ -430,13 +430,13 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-3 py-2 text-xs font-medium text-stone-400 hover:text-stone-200"
+                className="px-3 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 text-xs font-semibold text-stone-950 bg-amber-400 hover:bg-amber-300 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+                className="px-4 py-2 text-xs font-semibold bg-accent hover:bg-accent-hover text-slate-950 rounded-xl transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
               >
                 <Lock className="w-3.5 h-3.5" />
                 <span>Unlock Admin Panel</span>

@@ -136,6 +136,54 @@ export function deleteActivity(id: string): Activity[] {
   return updated;
 }
 
+export function importBatchActivities(incoming: Activity[]): {
+  updated: Activity[];
+  addedCount: number;
+  duplicateCount: number;
+} {
+  const current = loadActivities();
+  const existingIds = new Set(current.map((a) => a.id));
+
+  const toAdd: Activity[] = [];
+  let duplicateCount = 0;
+
+  for (const act of incoming) {
+    if (existingIds.has(act.id)) {
+      duplicateCount++;
+      continue;
+    }
+
+    // Duplicate detection on date + distance + type
+    const isDup = current.some((c) => {
+      if (c.activityType !== act.activityType) return false;
+      if (c.date !== act.date) return false;
+      if (Math.abs(c.distanceKm - act.distanceKm) > 0.08) return false;
+      return true;
+    });
+
+    if (isDup) {
+      duplicateCount++;
+      continue;
+    }
+
+    existingIds.add(act.id);
+    toAdd.push(act);
+  }
+
+  // Combine and sort chronologically descending (newest first)
+  const combined = [...toAdd, ...current].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
+  saveActivities(combined);
+
+  return {
+    updated: combined,
+    addedCount: toAdd.length,
+    duplicateCount,
+  };
+}
+
 export function loadSampleSeedData(): Activity[] {
   saveActivities(INITIAL_ACTIVITIES);
   return INITIAL_ACTIVITIES;

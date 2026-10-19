@@ -28,24 +28,24 @@ export const InteractiveKoreaMap: React.FC<InteractiveKoreaMapProps> = ({
   };
 
   return (
-    <section className="py-12 border-b border-stone-800">
+    <section className="py-12 border-b border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
-            <div className="flex items-center gap-2 text-xs font-semibold text-amber-400 uppercase tracking-wider mb-2">
+            <div className="flex items-center gap-2 text-xs font-semibold text-accent uppercase tracking-wider mb-2">
               <Compass className="w-3.5 h-3.5" />
               <span>Geographic Activity Map</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-100 tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight">
               South Korea Summit & Trail Map
             </h2>
-            <p className="text-stone-400 text-sm mt-1 max-w-2xl">
+            <p className="text-slate-400 text-sm mt-1 max-w-2xl">
               Visual map of peaks conquered across the Korean peninsula and Jeju Island. Pins highlight repeat ascent counts. Click any pin to inspect logs.
             </p>
           </div>
 
-          <div className="text-xs text-stone-400 font-mono">
+          <div className="text-xs text-slate-400 font-mono">
             <span>Projection: WGS84 Korean Peninsula</span>
           </div>
         </div>
@@ -53,22 +53,22 @@ export const InteractiveKoreaMap: React.FC<InteractiveKoreaMapProps> = ({
         {/* Map & Preview Split */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Interactive SVG Map Container */}
-          <div className="lg:col-span-8 bg-stone-900 border border-stone-800 rounded-2xl p-4 sm:p-6 overflow-hidden relative">
-            <div className="flex items-center justify-between mb-2 text-xs text-stone-400">
+          <div className="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 overflow-hidden relative">
+            <div className="flex items-center justify-between mb-2 text-xs text-slate-400">
               <span className="font-mono">South Korea Territory & Coastal Ridges</span>
               <div className="flex items-center gap-3">
                 <span className="inline-flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-accent" />
                   <span>10+ Summits Club</span>
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-stone-400" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-slate-400" />
                   <span>Summited Peak</span>
                 </span>
               </div>
             </div>
 
-            <div className="relative w-full aspect-[4/3] bg-stone-950 rounded-xl overflow-hidden border border-stone-850 flex items-center justify-center">
+            <div className="relative w-full aspect-[4/3] bg-slate-950 rounded-xl overflow-hidden border border-slate-850 flex items-center justify-center">
               <svg
                 viewBox="0 0 700 750"
                 className="w-full h-full select-none"
@@ -87,16 +87,16 @@ export const InteractiveKoreaMap: React.FC<InteractiveKoreaMapProps> = ({
                 {/* Stylized Korea Landmass path */}
                 <path
                   d="M180,60 L280,50 L420,80 L520,130 L550,220 L580,310 L560,420 L530,500 L440,550 L340,560 L240,530 L160,460 L140,360 L130,260 L140,160 Z"
-                  fill="#1c1917"
-                  stroke="#292524"
+                  fill="#0f172a"
+                  stroke="#1e293b"
                   strokeWidth="2"
                 />
 
                 {/* Jeju Island outline */}
                 <path
                   d="M130,670 C160,655 210,655 240,670 C245,685 220,705 180,710 C140,705 120,685 130,670 Z"
-                  fill="#1c1917"
-                  stroke="#292524"
+                  fill="#0f172a"
+                  stroke="#1e293b"
                   strokeWidth="2"
                 />
 
@@ -104,7 +104,7 @@ export const InteractiveKoreaMap: React.FC<InteractiveKoreaMapProps> = ({
                 <path
                   d="M480,120 Q440,240 430,340 T380,480"
                   fill="none"
-                  stroke="#44403c"
+                  stroke="#334155"
                   strokeWidth="2"
                   strokeDasharray="4 4"
                 />
@@ -128,22 +128,22 @@ export const InteractiveKoreaMap: React.FC<InteractiveKoreaMapProps> = ({
                 />
 
                 {/* Regional Labels */}
-                <text x="210" y="165" fill="#78716c" fontSize="12" fontFamily="sans-serif" fontWeight="600">
+                <text x="210" y="165" fill="#94a3b8" fontSize="12" fontFamily="sans-serif" fontWeight="600">
                   Seoul Capital Area
                 </text>
-                <text x="460" y="180" fill="#78716c" fontSize="12" fontFamily="sans-serif">
+                <text x="460" y="180" fill="#94a3b8" fontSize="12" fontFamily="sans-serif">
                   Gangwon-do Ridges
                 </text>
-                <text x="470" y="475" fill="#f59e0b" fontSize="12" fontFamily="sans-serif" fontWeight="600">
+                <text x="470" y="475" fill="var(--color-accent, #6366f1)" fontSize="12" fontFamily="sans-serif" fontWeight="600">
                   Busan Coastal Peaks (부산)
                 </text>
-                <text x="160" y="730" fill="#78716c" fontSize="12" fontFamily="sans-serif">
+                <text x="160" y="730" fill="#94a3b8" fontSize="12" fontFamily="sans-serif">
                   Jeju Island
                 </text>
-                <text x="540" y="270" fill="#57534e" fontSize="11" fontFamily="sans-serif">
+                <text x="540" y="270" fill="#64748b" fontSize="11" fontFamily="sans-serif">
                   East Sea
                 </text>
-                <text x="60" y="320" fill="#57534e" fontSize="11" fontFamily="sans-serif">
+                <text x="60" y="320" fill="#64748b" fontSize="11" fontFamily="sans-serif">
                   Yellow Sea
                 </text>
 
@@ -166,7 +166,7 @@ export const InteractiveKoreaMap: React.FC<InteractiveKoreaMapProps> = ({
                           cy={y}
                           r="18"
                           fill="none"
-                          stroke="#f59e0b"
+                          stroke="var(--color-accent, #6366f1)"
                           strokeWidth="1.5"
                           opacity="0.4"
                         />
@@ -177,8 +177,8 @@ export const InteractiveKoreaMap: React.FC<InteractiveKoreaMapProps> = ({
                         cx={x}
                         cy={y}
                         r={isSelected ? '12' : '9'}
-                        fill={isDoubleDigit ? '#f59e0b' : '#a8a29e'}
-                        stroke="#0c0a09"
+                        fill={isDoubleDigit ? 'var(--color-accent, #6366f1)' : '#64748b'}
+                        stroke="#0f172a"
                         strokeWidth="2"
                       />
 
@@ -187,7 +187,7 @@ export const InteractiveKoreaMap: React.FC<InteractiveKoreaMapProps> = ({
                         x={x}
                         y={y + 3.5}
                         textAnchor="middle"
-                        fill="#0c0a09"
+                        fill="#0f172a"
                         fontSize={isDoubleDigit ? '9' : '8'}
                         fontFamily="monospace"
                         fontWeight="bold"
@@ -199,7 +199,7 @@ export const InteractiveKoreaMap: React.FC<InteractiveKoreaMapProps> = ({
                       <text
                         x={x + 14}
                         y={y + 4}
-                        fill={isSelected ? '#f59e0b' : '#e7e5e4'}
+                        fill={isSelected ? 'var(--color-accent, #6366f1)' : '#e2e8f0'}
                         fontSize="11"
                         fontFamily="sans-serif"
                         fontWeight={isSelected ? 'bold' : 'normal'}
@@ -216,71 +216,71 @@ export const InteractiveKoreaMap: React.FC<InteractiveKoreaMapProps> = ({
           {/* Selected Peak Sidebar Card */}
           <div className="lg:col-span-4 flex flex-col">
             {selectedPin ? (
-              <div className="bg-stone-900 border border-stone-800 rounded-2xl p-6">
-                <div className="flex items-center justify-between text-xs text-amber-400 font-mono mb-2">
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                <div className="flex items-center justify-between text-xs text-accent font-mono mb-2">
                   <span>Selected Pin</span>
                   <span>{selectedPin.totalSummits} Total Summits</span>
                 </div>
 
                 <div className="flex items-baseline gap-2 mb-1">
-                  <h3 className="text-2xl font-bold text-stone-100">
+                  <h3 className="text-2xl font-bold text-slate-100">
                     {selectedPin.mountainName}
                   </h3>
                   {selectedPin.koreanName && (
-                    <span className="text-stone-400 font-medium">
+                    <span className="text-slate-400 font-medium">
                       {selectedPin.koreanName}
                     </span>
                   )}
                 </div>
 
-                <div className="text-xs text-stone-400 mb-4">
+                <div className="text-xs text-slate-400 mb-4">
                   {selectedPin.peakName} · {selectedPin.elevationM}m · {selectedPin.region}
                 </div>
 
                 {/* Photo preview */}
                 {selectedPin.coverPhoto && (
-                  <div className="relative aspect-[4/3] rounded-xl overflow-hidden border border-stone-800 mb-4 bg-stone-950">
+                  <div className="relative aspect-[4/3] rounded-xl overflow-hidden border border-slate-800 mb-4 bg-slate-950">
                     <img
                       src={selectedPin.coverPhoto}
                       alt={selectedPin.mountainName}
                       className="w-full h-full object-cover"
                       referrerPolicy="no-referrer"
                     />
-                    <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-stone-950/80 text-[10px] font-mono text-stone-300">
+                    <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-slate-950/80 text-[10px] font-mono text-slate-300">
                       {selectedPin.photoCount} photos available
                     </div>
                   </div>
                 )}
 
-                <div className="space-y-2.5 text-xs font-mono text-stone-300 mb-6">
-                  <div className="flex justify-between py-1.5 border-b border-stone-800">
-                    <span className="text-stone-500 font-sans">Latest Ascent</span>
+                <div className="space-y-2.5 text-xs font-mono text-slate-300 mb-6">
+                  <div className="flex justify-between py-1.5 border-b border-slate-800">
+                    <span className="text-slate-500 font-sans">Latest Ascent</span>
                     <span>{selectedPin.latestSummitDate}</span>
                   </div>
-                  <div className="flex justify-between py-1.5 border-b border-stone-800">
-                    <span className="text-stone-500 font-sans">First Ascent</span>
+                  <div className="flex justify-between py-1.5 border-b border-slate-800">
+                    <span className="text-slate-500 font-sans">First Ascent</span>
                     <span>{selectedPin.firstSummitDate}</span>
                   </div>
-                  <div className="flex justify-between py-1.5 border-b border-stone-800">
-                    <span className="text-stone-500 font-sans">Total Vertical Climbed</span>
-                    <span className="font-bold text-amber-400">+{selectedPin.totalElevationGainedM.toLocaleString()}m</span>
+                  <div className="flex justify-between py-1.5 border-b border-slate-800">
+                    <span className="text-slate-500 font-sans">Total Vertical Climbed</span>
+                    <span className="font-bold text-accent">+{selectedPin.totalElevationGainedM.toLocaleString()}m</span>
                   </div>
-                  <div className="flex justify-between py-1.5 border-b border-stone-800">
-                    <span className="text-stone-500 font-sans">Cumulative Distance</span>
+                  <div className="flex justify-between py-1.5 border-b border-slate-800">
+                    <span className="text-slate-500 font-sans">Cumulative Distance</span>
                     <span>{selectedPin.totalDistanceKm} km</span>
                   </div>
                 </div>
 
                 <button
                   onClick={() => onSelectMountain(selectedPin.mountainId)}
-                  className="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold bg-amber-400 hover:bg-amber-300 text-stone-950 transition-colors inline-flex items-center justify-center gap-2 shadow-sm"
+                  className="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold bg-accent hover:bg-accent-hover transition-colors inline-flex items-center justify-center gap-2 shadow-sm cursor-pointer"
                 >
                   <span>Open Full {selectedPin.mountainName} Summit Logs</span>
                   <ArrowUpRight className="w-4 h-4" />
                 </button>
               </div>
             ) : (
-              <div className="p-8 text-center text-stone-500 text-sm bg-stone-900 border border-stone-800 rounded-2xl">
+              <div className="p-8 text-center text-slate-500 text-sm bg-slate-900 border border-slate-800 rounded-2xl">
                 Click any mountain pin on the map to inspect its summit history.
               </div>
             )}

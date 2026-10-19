@@ -1,5 +1,140 @@
 @import "tailwindcss";
 
+@theme {
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-accent-dark: var(--color-accent-dark);
+  --color-accent-subtle: var(--color-accent-subtle);
+  --color-accent-border: var(--color-accent-border);
+}
+
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+}
+
+#root {
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  min-height: 100vh;
+}
+
+/* Eliminate horizontal slide bar across all browsers and devices */
+*::-webkit-scrollbar:horizontal {
+  display: none !important;
+  height: 0px !important;
+}
+
+/* Hide horizontal and vertical slide bars on requested containers while preserving touch scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+}
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+:root, [data-theme="emerald"] {
+  --color-accent: #34d399; /* Alpine Emerald 400 */
+  --color-accent-hover: #6ee7b7; /* Emerald 300 */
+  --color-accent-dark: #10b981; /* Emerald 500 */
+  --color-accent-subtle: rgba(16, 185, 129, 0.16);
+  --color-accent-border: rgba(16, 185, 129, 0.36);
+  --color-accent-glow: rgba(52, 211, 153, 0.4);
+  --color-accent-text: #020617;
+}
+
+[data-theme="cobalt"] {
+  --color-accent: #6366f1; /* Electric Cobalt / Alpine Indigo 500 */
+  --color-accent-hover: #818cf8; /* Indigo 400 */
+  --color-accent-dark: #4f46e5; /* Indigo 600 */
+  --color-accent-subtle: rgba(99, 102, 241, 0.16);
+  --color-accent-border: rgba(99, 102, 241, 0.38);
+  --color-accent-glow: rgba(99, 102, 241, 0.45);
+  --color-accent-text: #ffffff;
+}
+
+[data-theme="cyan"] {
+  --color-accent: #22d3ee; /* Glacier Cyan 400 */
+  --color-accent-hover: #67e8f9; /* Cyan 300 */
+  --color-accent-dark: #06b6d4; /* Cyan 500 */
+  --color-accent-subtle: rgba(6, 182, 212, 0.14);
+  --color-accent-border: rgba(6, 182, 212, 0.32);
+  --color-accent-glow: rgba(34, 211, 238, 0.3);
+  --color-accent-text: #020617;
+}
+
+[data-theme="teal"] {
+  --color-accent: #2dd4bf; /* Aurora Teal / Glacial Mint 400 */
+  --color-accent-hover: #5eead4; /* Teal 300 */
+  --color-accent-dark: #0d9488; /* Teal 600 */
+  --color-accent-subtle: rgba(45, 212, 191, 0.14);
+  --color-accent-border: rgba(45, 212, 191, 0.34);
+  --color-accent-glow: rgba(45, 212, 191, 0.38);
+  --color-accent-text: #020617;
+}
+
+[data-theme="sapphire"] {
+  --color-accent: #38bdf8; /* Arctic Sapphire 400 */
+  --color-accent-hover: #7dd3fc; /* Sky 300 */
+  --color-accent-dark: #0284c7; /* Sky 600 */
+  --color-accent-subtle: rgba(14, 165, 233, 0.14);
+  --color-accent-border: rgba(14, 165, 233, 0.32);
+  --color-accent-glow: rgba(56, 189, 248, 0.3);
+  --color-accent-text: #020617;
+}
+
+
+
+[data-theme="violet"] {
+  --color-accent: #a855f7; /* Summit Twilight / Violet Frost 500 */
+  --color-accent-hover: #c084fc; /* Purple 400 */
+  --color-accent-dark: #9333ea; /* Purple 600 */
+  --color-accent-subtle: rgba(168, 85, 247, 0.15);
+  --color-accent-border: rgba(168, 85, 247, 0.36);
+  --color-accent-glow: rgba(168, 85, 247, 0.42);
+  --color-accent-text: #ffffff;
+}
+
+/* Explicit CSS utility classes for maximum cross-browser fidelity */
+.text-accent {
+  color: var(--color-accent);
+}
+.text-accent-hover:hover {
+  color: var(--color-accent-hover);
+}
+.bg-accent {
+  background-color: var(--color-accent);
+  color: var(--color-accent-text);
+}
+.bg-accent.text-slate-950,
+.bg-accent.text-stone-950 {
+  color: var(--color-accent-text);
+}
+.hover\:bg-accent-hover:hover {
+  background-color: var(--color-accent-hover);
+}
+.border-accent {
+  border-color: var(--color-accent);
+}
+.border-accent-border {
+  border-color: var(--color-accent-border);
+}
+.bg-accent-subtle {
+  background-color: var(--color-accent-subtle);
+}
+.ring-accent-glow {
+  --tw-ring-color: var(--color-accent-glow);
+}
+
 @layer base {
   html, body {
     font-family: 'Plus Jakarta Sans', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;

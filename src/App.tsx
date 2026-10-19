@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Activity, MountainSummary, PhotoItem, SummitLog, RunningLog } from './types/activity';
-import { loadActivities, initStorage, addActivity, updateActivity, deleteActivity, saveActivities } from './services/storageService';
+import { loadActivities, initStorage, addActivity, updateActivity, deleteActivity, saveActivities, importBatchActivities } from './services/storageService';
+import { StravaSyncModal } from './components/StravaSyncModal';
 import {
   subscribeToFirestoreActivities,
   saveActivityToFirestore,
@@ -51,6 +52,7 @@ export default function App() {
   const [isDataModalOpen, setIsDataModalOpen] = useState<boolean>(false);
   const [isAdminAuthOpen, setIsAdminAuthOpen] = useState<boolean>(false);
   const [isKoreaDirectoryOpen, setIsKoreaDirectoryOpen] = useState<boolean>(false);
+  const [isStravaModalOpen, setIsStravaModalOpen] = useState<boolean>(false);
   const [activityPendingDelete, setActivityPendingDelete] = useState<{ id: string; name: string } | null>(null);
   const [lightboxData, setLightboxData] = useState<{
     photo: PhotoItem;
@@ -168,6 +170,26 @@ export default function App() {
         console.warn('Firestore create note:', err);
         showToast('Saved locally. Sign in with Google to sync with cloud database.', 'info');
       }
+    }
+  };
+
+  // Batch import activities from Strava
+  const handleImportStravaActivities = async (importedRuns: RunningLog[]) => {
+    const { updated, addedCount, duplicateCount } = importBatchActivities(importedRuns);
+    setActivities(updated);
+
+    // Push new activities to Firestore cloud database
+    try {
+      await syncAllActivitiesToFirestore(updated);
+      showToast(
+        `Imported ${addedCount} Strava run${addedCount === 1 ? '' : 's'} and synchronized to Cloud!${
+          duplicateCount > 0 ? ` (${duplicateCount} duplicate${duplicateCount === 1 ? '' : 's'} skipped)` : ''
+        }`,
+        'success'
+      );
+    } catch (err) {
+      console.warn('Firestore sync note:', err);
+      showToast(`Imported ${addedCount} Strava run${addedCount === 1 ? '' : 's'} into PeakPulse!`, 'success');
     }
   };
 
@@ -309,11 +331,21 @@ export default function App() {
     setLightboxData({ photo, title, subtitle });
   };
 
+  // Strava modal trigger with viewer mode security check
+  const handleOpenStravaModal = () => {
+    if (!isAdmin) {
+      showToast('Admin authorization required. Strava access is disabled in Viewer mode.', 'error');
+      setIsAdminAuthOpen(true);
+      return;
+    }
+    setIsStravaModalOpen(true);
+  };
+
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col font-sans selection:bg-amber-500/20 selection:text-amber-300">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-accent-subtle selection:text-accent overflow-x-hidden w-full max-w-full">
       {/* Toast Notification Banner */}
       {toastMsg && (
-        <div className="fixed top-20 right-4 z-50 max-w-sm p-3.5 rounded-xl bg-stone-900 border border-stone-700 shadow-2xl flex items-center gap-2.5 text-xs text-stone-200 animate-in fade-in slide-in-from-top-4 duration-300">
+        <div className="fixed top-20 right-4 z-50 max-w-sm p-3.5 rounded-xl bg-slate-900 border border-slate-700 shadow-2xl flex items-center gap-2.5 text-xs text-slate-200 animate-in fade-in slide-in-from-top-4 duration-300">
           {toastMsg.type === 'success' ? (
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           ) : toastMsg.type === 'info' ? (
@@ -325,14 +357,13 @@ export default function App() {
         </div>
       )}
 
-      {/* Navigation */}
+      {/* Navigation (Clean - no sync cloud and no strava in menu) */}
       <Navbar
         activeTab={activeTab}
         onSelectTab={setActiveTab}
         isAdmin={isAdmin}
         firebaseUserEmail={firebaseUserEmail}
         onOpenLogModal={handleOpenGeneralLogModal}
-        onOpenDataModal={() => setIsDataModalOpen(true)}
         onOpenAdminLogin={() => setIsAdminAuthOpen(true)}
         onLogoutAdmin={handleLogout}
         onOpenSecurityModal={() => setIsAdminAuthOpen(true)}
@@ -421,6 +452,7 @@ export default function App() {
             onEditActivity={handleStartEditActivity}
             onDeleteActivity={promptDeleteActivity}
             initialFilter="running"
+            onOpenStravaModal={isAdmin ? handleOpenStravaModal : undefined}
           />
         )}
 
@@ -455,23 +487,23 @@ export default function App() {
       {/* Delete Confirmation Modal (Native UI without window.confirm) */}
       {activityPendingDelete && (
         <div
-          className="fixed inset-0 z-[70] bg-stone-950/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 z-[70] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
           role="dialog"
           aria-modal="true"
         >
-          <div className="relative w-full max-w-md bg-stone-900 border border-stone-800 rounded-2xl p-6 shadow-2xl flex flex-col items-center text-center">
+          <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col items-center text-center">
             <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center mb-4 shadow-lg shadow-rose-950/40">
               <Trash2 className="w-7 h-7" />
             </div>
 
-            <h3 className="text-xl font-bold text-stone-100 mb-1">
+            <h3 className="text-xl font-bold text-slate-100 mb-1">
               Delete Ascent Log?
             </h3>
-            <p className="text-amber-400 font-semibold text-sm mb-3">
+            <p className="text-accent font-semibold text-sm mb-3">
               "{activityPendingDelete.name}"
             </p>
 
-            <p className="text-stone-400 text-xs sm:text-sm leading-relaxed mb-6">
+            <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-6">
               Are you sure you want to permanently delete this log? This will recalculate your summit counts, update your stats, and remove the entry from Cloud Firestore.
             </p>
 
@@ -479,7 +511,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setActivityPendingDelete(null)}
-                className="flex-1 py-2.5 px-4 bg-stone-800 hover:bg-stone-750 text-stone-300 font-medium rounded-xl text-xs sm:text-sm transition-colors cursor-pointer"
+                className="flex-1 py-2.5 px-4 bg-slate-800 hover:bg-slate-750 text-slate-300 font-medium rounded-xl text-xs sm:text-sm transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -584,19 +616,30 @@ export default function App() {
         }}
       />
 
+      {/* Strava Run Sync & Import Modal - Restricted to Admin Mode */}
+      {isAdmin && isStravaModalOpen && (
+        <StravaSyncModal
+          isOpen={isStravaModalOpen && isAdmin}
+          onClose={() => setIsStravaModalOpen(false)}
+          isAdmin={isAdmin}
+          existingActivities={activities}
+          onImportActivities={handleImportStravaActivities}
+        />
+      )}
+
       {/* Footer */}
-      <footer className="border-t border-stone-800 bg-stone-950 py-10 text-xs text-stone-400">
+      <footer className="border-t border-slate-800 bg-slate-950 py-10 text-xs text-slate-400">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+            <div className="w-5 h-5 rounded bg-accent-subtle border border-accent-border flex items-center justify-center text-accent">
               <Mountain className="w-3 h-3" />
             </div>
-            <span className="font-bold text-stone-200">PeakPulse Korea</span>
-            <span className="text-stone-600">·</span>
+            <span className="font-bold text-slate-200">PeakPulse Korea</span>
+            <span className="text-slate-600">·</span>
             <span>Personal Mountaineering & Running Expedition Journal</span>
           </div>
 
-          <div className="flex items-center gap-4 text-stone-500 font-mono">
+          <div className="flex items-center gap-4 text-slate-500 font-mono">
             <span>Busan & South Korea 🇰🇷</span>
             <span>·</span>
             <span className="text-orange-400/90 inline-flex items-center gap-1">
@@ -605,10 +648,20 @@ export default function App() {
             </span>
             <span>·</span>
             {isAdmin ? (
-              <span className="text-amber-400 inline-flex items-center gap-1">
-                <ShieldCheck className="w-3 h-3" />
-                <span>Admin Mode</span>
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-accent inline-flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3" />
+                  <span>Admin Mode</span>
+                </span>
+                <span className="text-slate-600">·</span>
+                <button
+                  onClick={() => setIsDataModalOpen(true)}
+                  className="hover:text-slate-200 underline cursor-pointer"
+                  title="Local & cloud backup export"
+                >
+                  Backup Data
+                </button>
+              </div>
             ) : (
               <span>Viewer Mode</span>
             )}

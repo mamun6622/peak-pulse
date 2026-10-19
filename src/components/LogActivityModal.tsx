@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   Edit,
+  Search,
 } from 'lucide-react';
 import { Activity, SummitLog, RunningLog, PhotoItem, MountainSummary } from '../types/activity';
 import { formatPace } from '../utils/activityStats';
@@ -399,10 +400,10 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
         <div className="p-5 sm:p-6 border-b border-stone-800 bg-stone-950 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl sm:text-2xl font-bold text-stone-100 flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-100 flex items-center gap-2">
                 {isEditing ? (
                   <>
-                    <Edit className="w-5 h-5 text-amber-400" />
+                    <Edit className="w-5 h-5 text-accent" />
                     <span>Edit Activity Log</span>
                   </>
                 ) : (
@@ -410,7 +411,7 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
                 )}
               </h2>
             </div>
-            <p className="text-xs text-stone-400 mt-0.5">
+            <p className="text-xs text-slate-400 mt-0.5">
               {isEditing
                 ? 'Update summit ascent or running details and synchronize with Cloud Firestore'
                 : 'Record a new mountain summit or endurance run with date, elevation, and photos'}
@@ -418,7 +419,7 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-stone-400 hover:text-white bg-stone-900 rounded-xl transition-colors cursor-pointer"
+            className="p-2 text-slate-400 hover:text-white bg-slate-900 rounded-xl transition-colors cursor-pointer"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
@@ -426,7 +427,7 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
         </div>
 
         {/* Database Status Banner */}
-        <div className="px-5 sm:px-6 py-2.5 bg-stone-950/90 border-b border-stone-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div className="px-5 sm:px-6 py-2.5 bg-slate-950/90 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
           {currentUser ? (
             <div className="flex items-center gap-2 text-emerald-400 font-medium">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -438,7 +439,7 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
             </div>
           ) : (
             <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-1.5 text-amber-400">
+              <div className="flex items-center gap-1.5 text-accent">
                 <AlertTriangle className="w-4 h-4 shrink-0" />
                 <span>
                   Offline/Local Mode. Sign in with Google to sync directly to Firebase Cloud Database.
@@ -448,7 +449,7 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
                 type="button"
                 onClick={handleQuickGoogleSignIn}
                 disabled={isSigningIn}
-                className="px-2.5 py-1 bg-white hover:bg-stone-100 text-stone-950 text-[11px] font-bold rounded-lg transition-colors cursor-pointer shrink-0"
+                className="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-950 text-[11px] font-bold rounded-lg transition-colors cursor-pointer shrink-0"
               >
                 {isSigningIn ? 'Signing in...' : 'Sign in with Google'}
               </button>
@@ -467,7 +468,7 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
           {/* Activity Type Selector */}
           {!isEditing && (
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-stone-400 block mb-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-2">
                 Activity Category
               </label>
               <div className="grid grid-cols-2 gap-3">
@@ -476,8 +477,8 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
                   onClick={() => setActivityType('summit')}
                   className={`p-3.5 rounded-xl border flex items-center justify-center gap-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                     activityType === 'summit'
-                      ? 'bg-amber-400 text-stone-950 border-amber-400 shadow-md'
-                      : 'bg-stone-950 border-stone-800 text-stone-300 hover:border-stone-700'
+                      ? 'bg-accent text-slate-950 border-accent shadow-md'
+                      : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
                   }`}
                 >
                   <Mountain className="w-4 h-4" />
@@ -488,8 +489,8 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
                   onClick={() => setActivityType('running')}
                   className={`p-3.5 rounded-xl border flex items-center justify-center gap-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                     activityType === 'running'
-                      ? 'bg-amber-400 text-stone-950 border-amber-400 shadow-md'
-                      : 'bg-stone-950 border-stone-800 text-stone-300 hover:border-stone-700'
+                      ? 'bg-accent text-slate-950 border-accent shadow-md'
+                      : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
                   }`}
                 >
                   <Footprints className="w-4 h-4" />
@@ -503,23 +504,23 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
           {activityType === 'summit' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold uppercase tracking-wider text-stone-400">
+                <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Select Korean Mountain
                 </label>
                 <button
                   type="button"
                   onClick={() => setIsCustomMountain(!isCustomMountain)}
-                  className="text-xs text-amber-400 hover:text-amber-300 underline cursor-pointer"
+                  className="text-xs text-accent hover:text-accent-hover underline cursor-pointer"
                 >
                   {isCustomMountain ? '← Pick from Directory' : '+ Custom / Local Peak'}
                 </button>
               </div>
 
               {!isCustomMountain ? (
-                <div className="space-y-2.5 p-3.5 bg-stone-950 rounded-xl border border-stone-800">
+                <div className="space-y-2.5 p-3.5 bg-slate-950 rounded-xl border border-slate-800">
                   {/* Region filter chips */}
                   <div className="flex flex-wrap items-center gap-1.5 text-xs">
-                    <span className="text-[11px] text-stone-500 mr-1">Region:</span>
+                    <span className="text-[11px] text-slate-500 mr-1">Region:</span>
                     {['all', 'Busan', 'Seoul', 'Gangwon', 'Gyeonggi', 'Chungcheong', 'Jeolla', 'Gyeongnam', 'Gyeongbuk', 'Ulsan', 'Gimhae', 'Geoje', 'Jeju'].map(
                       (prov) => (
                         <button
@@ -528,8 +529,8 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
                           onClick={() => setSelectedProvince(prov)}
                           className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer ${
                             selectedProvince === prov
-                              ? 'bg-amber-400 text-stone-950 font-bold'
-                              : 'bg-stone-900 text-stone-400 hover:text-stone-200'
+                              ? 'bg-accent text-slate-950 font-bold'
+                              : 'bg-slate-900 text-slate-400 hover:text-slate-200'
                           }`}
                         >
                           {prov === 'all' ? 'All Korea' : prov}
@@ -538,11 +539,32 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
                     )}
                   </div>
 
+                  {/* Mountain Search input */}
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Type mountain name, hangul, or peak (e.g. Geumjeong, Jang, 백운)..."
+                      value={mountainSearchQuery}
+                      onChange={(e) => setMountainSearchQuery(e.target.value)}
+                      className="w-full px-3 py-1.5 pl-8 pr-7 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-accent"
+                    />
+                    <Search className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                    {mountainSearchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setMountainSearchQuery('')}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 text-xs px-1"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+
                   {/* Mountain dropdown */}
                   <select
                     value={selectedMountainId}
                     onChange={(e) => setSelectedMountainId(e.target.value)}
-                    className="w-full px-3 py-2 bg-stone-900 border border-stone-800 rounded-xl text-xs sm:text-sm text-stone-100 focus:outline-none focus:border-amber-400"
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs sm:text-sm text-slate-100 focus:outline-none focus:border-accent"
                   >
                     {filteredKoreaMountains.map((m) => (
                       <option key={m.id} value={m.id}>
@@ -553,60 +575,60 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
 
                   {/* Selected Mountain Info badge */}
                   {selectedKoreaMountain && (
-                    <div className="pt-2 text-xs flex flex-wrap items-center justify-between gap-2 text-stone-400 border-t border-stone-850">
+                    <div className="pt-2 text-xs flex flex-wrap items-center justify-between gap-2 text-slate-400 border-t border-slate-850">
                       <span>
-                        Peak: <strong className="text-stone-200">{selectedKoreaMountain.peakName}</strong> (
+                        Peak: <strong className="text-slate-200">{selectedKoreaMountain.peakName}</strong> (
                         {selectedKoreaMountain.elevationM}m)
                       </span>
                       <span>
-                        Recorded Ascents: <strong className="text-amber-400">#{nextSummitNumber}</strong>
+                        Recorded Ascents: <strong className="text-accent">#{nextSummitNumber}</strong>
                       </span>
                     </div>
                   )}
                 </div>
               ) : (
                 /* Custom Mountain inputs */
-                <div className="p-3.5 bg-stone-950 rounded-xl border border-stone-800 space-y-3">
+                <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-800 space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="text-[11px] text-stone-400 block mb-1">Mountain Name</label>
+                      <label className="text-[11px] text-slate-400 block mb-1">Mountain Name</label>
                       <input
                         type="text"
                         placeholder="e.g. Geumjeongsan, Hwangnyeongsan"
                         value={customMountainName}
                         onChange={(e) => setCustomMountainName(e.target.value)}
-                        className="w-full px-3 py-2 bg-stone-900 border border-stone-800 rounded-xl text-xs text-stone-100 focus:outline-none focus:border-amber-400"
+                        className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-accent"
                       />
                     </div>
                     <div>
-                      <label className="text-[11px] text-stone-400 block mb-1">Hangul Name (Korean)</label>
+                      <label className="text-[11px] text-slate-400 block mb-1">Hangul Name (Korean)</label>
                       <input
                         type="text"
                         placeholder="e.g. 금정산"
                         value={customKoreanName}
                         onChange={(e) => setCustomKoreanName(e.target.value)}
-                        className="w-full px-3 py-2 bg-stone-900 border border-stone-800 rounded-xl text-xs text-stone-100 focus:outline-none focus:border-amber-400"
+                        className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-accent"
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-[11px] text-stone-400 block mb-1">Peak Name</label>
+                      <label className="text-[11px] text-slate-400 block mb-1">Peak Name</label>
                       <input
                         type="text"
                         placeholder="e.g. Godangbong"
                         value={customPeakName}
                         onChange={(e) => setCustomPeakName(e.target.value)}
-                        className="w-full px-3 py-2 bg-stone-900 border border-stone-800 rounded-xl text-xs text-stone-100 focus:outline-none focus:border-amber-400"
+                        className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-accent"
                       />
                     </div>
                     <div>
-                      <label className="text-[11px] text-stone-400 block mb-1">Peak Elevation (m)</label>
+                      <label className="text-[11px] text-slate-400 block mb-1">Peak Elevation (m)</label>
                       <input
                         type="number"
                         value={customElevation}
                         onChange={(e) => setCustomElevation(Number(e.target.value))}
-                        className="w-full px-3 py-2 bg-stone-900 border border-stone-800 rounded-xl text-xs text-stone-100 focus:outline-none focus:border-amber-400"
+                        className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-accent"
                       />
                     </div>
                   </div>
@@ -622,15 +644,15 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
                     placeholder="e.g. Beomeosa Temple → Godangbong → North Gate"
                     value={trailTaken}
                     onChange={(e) => setTrailTaken(e.target.value)}
-                    className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-stone-100 focus:outline-none focus:border-amber-400"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-accent"
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] text-stone-400 block mb-1">Weather Conditions</label>
+                  <label className="text-[11px] text-slate-400 block mb-1">Weather Conditions</label>
                   <select
                     value={weather}
                     onChange={(e) => setWeather(e.target.value as any)}
-                    className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-stone-100 focus:outline-none focus:border-amber-400"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-accent"
                   >
                     <option value="Clear / Sunny">Clear / Sunny ☀️</option>
                     <option value="Crisp Sunrise">Crisp Sunrise 🌅</option>
@@ -643,11 +665,11 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
               </div>
 
               <div>
-                <label className="text-[11px] text-stone-400 block mb-1">Companions / Ascent Style</label>
+                <label className="text-[11px] text-slate-400 block mb-1">Companions / Ascent Style</label>
                 <select
                   value={companions}
                   onChange={(e) => setCompanions(e.target.value as any)}
-                  className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-stone-100 focus:outline-none focus:border-amber-400"
+                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-accent"
                 >
                   <option value="Solo">Solo Ascent 🧗</option>
                   <option value="With Friends / Family">With Friends / Family 👥</option>
@@ -662,33 +684,33 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
           {activityType === 'running' && (
             <div className="space-y-4">
               <div>
-                <label className="text-[11px] text-stone-400 block mb-1">Workout Title</label>
+                <label className="text-[11px] text-slate-400 block mb-1">Workout Title</label>
                 <input
                   type="text"
                   placeholder="e.g. Busan Haeundae Beach Promenade 10K"
                   value={runTitle}
                   onChange={(e) => setRunTitle(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs sm:text-sm text-stone-100 focus:outline-none focus:border-amber-400"
+                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs sm:text-sm text-slate-100 focus:outline-none focus:border-accent"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] text-stone-400 block mb-1">Location / Course</label>
+                  <label className="text-[11px] text-slate-400 block mb-1">Location / Course</label>
                   <input
                     type="text"
                     placeholder="e.g. Haeundae Dongbaekseom Island, Busan"
                     value={runLocation}
                     onChange={(e) => setRunLocation(e.target.value)}
-                    className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-stone-100 focus:outline-none focus:border-amber-400"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-accent"
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] text-stone-400 block mb-1">Route Terrain</label>
+                  <label className="text-[11px] text-slate-400 block mb-1">Route Terrain</label>
                   <select
                     value={runRouteType}
                     onChange={(e) => setRunRouteType(e.target.value as any)}
-                    className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-stone-100 focus:outline-none focus:border-amber-400"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-accent"
                   >
                     <option value="Riverfront">Riverfront / Coastal 🌊</option>
                     <option value="Mountain Trail">Mountain Trail 🌲</option>
@@ -699,57 +721,57 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
               </div>
 
               <div>
-                <label className="text-[11px] text-stone-400 block mb-1">Footwear / Shoes</label>
+                <label className="text-[11px] text-slate-400 block mb-1">Footwear / Shoes</label>
                 <input
                   type="text"
                   placeholder="e.g. Hoka Speedgoat 5, Nike Pegasus Trail"
                   value={runShoes}
                   onChange={(e) => setRunShoes(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-stone-100 focus:outline-none focus:border-amber-400"
+                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-accent"
                 />
               </div>
             </div>
           )}
 
           {/* SHARED METRICS: Date, Time, Distance, Duration, Elevation */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2 border-t border-stone-850">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-800">
             <div>
-              <label className="text-[11px] text-stone-400 block mb-1">Date</label>
+              <label className="text-[11px] text-slate-400 block mb-1">Date</label>
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-stone-100 focus:outline-none focus:border-amber-400"
+                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-accent"
               />
             </div>
             <div>
-              <label className="text-[11px] text-stone-400 block mb-1">Start Time</label>
+              <label className="text-[11px] text-slate-400 block mb-1">Start Time</label>
               <input
                 type="time"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-stone-100 focus:outline-none focus:border-amber-400"
+                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-accent"
               />
             </div>
             <div>
-              <label className="text-[11px] text-stone-400 block mb-1">Duration (minutes)</label>
+              <label className="text-[11px] text-slate-400 block mb-1">Duration (minutes)</label>
               <input
                 type="number"
                 min="1"
                 value={durationMinutes}
                 onChange={(e) => setDurationMinutes(Number(e.target.value))}
-                className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-stone-100 focus:outline-none focus:border-amber-400"
+                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-accent"
               />
             </div>
             <div>
-              <label className="text-[11px] text-stone-400 block mb-1">Distance (km)</label>
+              <label className="text-[11px] text-slate-400 block mb-1">Distance (km)</label>
               <input
                 type="number"
                 step="0.1"
                 min="0.1"
                 value={distanceKm}
                 onChange={(e) => setDistanceKm(Number(e.target.value))}
-                className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-stone-100 focus:outline-none focus:border-amber-400"
+                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-accent"
               />
             </div>
             <div>
@@ -759,27 +781,27 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
                 min="0"
                 value={elevationGainM}
                 onChange={(e) => setElevationGainM(Number(e.target.value))}
-                className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-stone-100 focus:outline-none focus:border-amber-400"
+                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-accent"
               />
             </div>
           </div>
 
           {/* PHOTOS SECTION */}
-          <div className="pt-2 border-t border-stone-850 space-y-3">
+          <div className="pt-2 border-t border-slate-800 space-y-3">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold uppercase tracking-wider text-stone-400 flex items-center gap-1.5">
-                <Camera className="w-3.5 h-3.5 text-amber-400" />
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <Camera className="w-3.5 h-3.5 text-accent" />
                 <span>Upload Summit Photos ({uploadedPhotos.length})</span>
               </label>
-              <span className="text-[11px] text-stone-500">
+              <span className="text-[11px] text-slate-500">
                 Compressed automatically for Cloud Firestore
               </span>
             </div>
 
             <div className="space-y-3">
-              <label className="w-full py-4 px-4 border-2 border-dashed border-stone-800 hover:border-amber-400/60 rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer bg-stone-950/60 hover:bg-stone-950 transition-all text-center">
-                <Upload className="w-5 h-5 text-stone-400" />
-                <span className="text-xs font-medium text-stone-300">
+              <label className="w-full py-4 px-4 border-2 border-dashed border-slate-800 hover:border-accent rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer bg-slate-950/60 hover:bg-slate-950 transition-all text-center">
+                <Upload className="w-5 h-5 text-slate-400" />
+                <span className="text-xs font-medium text-slate-300">
                   {isCompressingPhotos
                     ? 'Optimizing photos for database storage...'
                     : 'Click or drag photos to upload (Summit stone, panoramas, trail)'}
@@ -800,8 +822,8 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
                   {uploadedPhotos.map((photo) => (
                     <div
                       key={photo.id}
-                      className={`relative group rounded-xl overflow-hidden border aspect-square bg-stone-950 flex flex-col justify-between p-2 transition-all ${
-                        photo.isCover ? 'border-amber-400 ring-2 ring-amber-400/30' : 'border-stone-800'
+                      className={`relative group rounded-xl overflow-hidden border aspect-square bg-slate-950 flex flex-col justify-between p-2 transition-all ${
+                        photo.isCover ? 'border-accent ring-2 ring-accent-glow' : 'border-slate-800'
                       }`}
                     >
                       <img
@@ -809,12 +831,12 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
                         alt={photo.caption || 'Photo'}
                         className="absolute inset-0 w-full h-full object-cover"
                       />
-                      <div className="absolute inset-0 bg-stone-950/30 group-hover:bg-stone-950/40 transition-colors pointer-events-none" />
+                      <div className="absolute inset-0 bg-slate-950/30 group-hover:bg-slate-950/40 transition-colors pointer-events-none" />
 
                       {/* Top Bar: Cover Badge and Remove Button */}
                       <div className="relative z-10 flex items-center justify-between w-full">
                         {photo.isCover ? (
-                          <span className="px-2 py-0.5 rounded-md bg-amber-400 text-stone-950 text-[10px] font-extrabold shadow flex items-center gap-1">
+                          <span className="px-2 py-0.5 rounded-md bg-accent text-slate-950 text-[10px] font-extrabold shadow flex items-center gap-1">
                             ★ Cover
                           </span>
                         ) : (
@@ -837,8 +859,8 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
                           onClick={() => toggleCoverPhoto(photo.id)}
                           className={`w-full py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer shadow text-center ${
                             photo.isCover
-                              ? 'bg-amber-400 text-stone-950 font-bold'
-                              : 'bg-stone-900/90 text-stone-200 hover:bg-amber-400 hover:text-stone-950 border border-stone-700/80 backdrop-blur-sm'
+                              ? 'bg-accent text-slate-950 font-bold'
+                              : 'bg-slate-900/90 text-slate-200 hover:bg-accent hover:text-slate-950 border border-slate-700/80 backdrop-blur-sm'
                           }`}
                         >
                           {photo.isCover ? '★ Selected Cover' : 'Set as Cover'}
@@ -852,8 +874,8 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
           </div>
 
           {/* Notes */}
-          <div className="pt-2 border-t border-stone-850">
-            <label className="text-[11px] text-stone-400 block mb-1">
+          <div className="pt-2 border-t border-slate-800">
+            <label className="text-[11px] text-slate-400 block mb-1">
               Personal Notes & Experience Story
             </label>
             <textarea
@@ -861,22 +883,22 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
               placeholder="Reflections on the ridge, weather conditions, trail highlights, gear notes..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs sm:text-sm text-stone-100 placeholder:text-stone-600 focus:outline-none focus:border-amber-400"
+              className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs sm:text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-accent"
             />
           </div>
 
           {/* Form Actions */}
-          <div className="pt-4 border-t border-stone-800 flex items-center justify-end gap-3">
+          <div className="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs sm:text-sm font-medium text-stone-400 hover:text-stone-200 cursor-pointer"
+              className="px-4 py-2 text-xs sm:text-sm font-medium text-slate-400 hover:text-slate-200 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 text-xs sm:text-sm font-semibold text-stone-950 bg-amber-400 hover:bg-amber-300 rounded-xl transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
+              className="px-5 py-2.5 text-xs sm:text-sm font-semibold bg-accent hover:bg-accent-hover text-slate-950 rounded-xl transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>
