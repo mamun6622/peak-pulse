@@ -2,7 +2,7 @@
 
 **Peak Pulse** is a mountain and fitness tracking website designed to help users explore mountains, track their running activities, and monitor their fitness journey.
 
-🌐 **Live Website:** https://peakpulse.ai.studio/
+🌐 **Live Website:** https://peak-pulse-six.vercel.app
 
 ---
 
@@ -21,7 +21,7 @@
 
 Visit the website here:
 
-👉 https://peakpulse.ai.studio/
+👉 https://peak-pulse-six.vercel.app
 
 ---
 
